@@ -1,3 +1,3 @@
 ## Schéma Entité-Association
 
-Entités : Voyages, Etape, Employe, Client,
+Entités : Agence, Voyages, Etape, Employe, Client,
