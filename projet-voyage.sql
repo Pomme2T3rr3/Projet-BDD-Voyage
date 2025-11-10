@@ -35,7 +35,7 @@ CREATE TABLE ville(
 CREATE TABLE visa(
     idVisa serial primary key,
     typev varchar(10),
-    prixVisa int,
+    prixVisa int
 );
 
 CREATE TABLE client(
@@ -64,16 +64,16 @@ CREATE TABLE etape(
     idEt serial primary key,
     TyP varchar(20),
     transport varchar(15),
-    depart int idVille references ville(idVille),
-    arrivee int idVille references ville(idVille),
+    depart int references ville(idVille),
+    arrivee int references ville(idVille),
     dateDepart date NOT NULL,
     dateArrivee date NOT NULL
 );
 
 CREATE TABLE voyage(
     idVoy serial primary key,
-    dateDebut date ,
-    dateFin date ,
+    dateDebut date,
+    dateFin date,
     PrixPersonne numeric(6,2),
     descriptif text,
     planifie_par int references employe(idEmp)
@@ -101,9 +101,9 @@ CREATE TABLE obtient(
 );
 
 CREATE TABLE parle(
-    codeP int references pays(codeP),
+    codeP char(3) references pays(codeP),
     langue varchar(15),
-    primary key(idCli, idVoy)
+    primary key(codeP, langue)
 );
 
 
@@ -206,17 +206,18 @@ INSERT INTO fait (idCli, idVoy) VALUES
 
 -- TABLE obtient
 -- Quels clients ont obtenu quels visas
-INSERT INTO obtient (idCli, idVisa) VALUES
-(1, 1),
-(2, 2),
-(3, 1),
-(4, 1),
-(5, 2),
-(6, 3),
-(7, 1),
-(8, 1),
-(9, 2),
-(10, 1);
+INSERT INTO obtient (idCli, codeP ,idVisa) VALUES
+(1, 'FRA', 1),
+(2, 'ESP', 2),
+(3, 'ITA', 1),
+(4, 'USA', 1),
+(5, 'MAR', 2),
+(6, 'JPN', 3),
+(7, 'MAR', 1),
+(8, 'FRA', 1),
+(9, 'ESP', 2),
+(10, 'USA', 1);
+
 
 -- TABLE parle
 INSERT INTO parle (codeP, langue) VALUES
