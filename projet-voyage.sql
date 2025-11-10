@@ -14,7 +14,7 @@ DROP TABLE IF EXISTS parle CASCADE;
 
 
 
-CREATE TABLE agence( 
+CREATE TABLE agence(
     idA serial primary key,
     nom varchar(25),
     adresse text
@@ -60,7 +60,7 @@ CREATE TABLE employe(
     est_resp int references agence(idA)
 );
 
-CREATE TABLE etape( 
+CREATE TABLE etape(
     idEt serial primary key,
     TyP varchar(20),
     transport varchar(15),
@@ -97,6 +97,8 @@ CREATE TABLE obtient(
     idCli int references client(idCli),
     codeP char(3) references pays(codeP),
     idVisa int references visa(idVisa),
+    dateObt date NOT NULL,
+    dateExp date NOT NULL,
     primary key(idCli, codeP , idVisa)
 );
 
@@ -206,17 +208,17 @@ INSERT INTO fait (idCli, idVoy) VALUES
 
 -- TABLE obtient
 -- Quels clients ont obtenu quels visas
-INSERT INTO obtient (idCli, codeP ,idVisa) VALUES
-(1, 'FRA', 1),
-(2, 'ESP', 2),
-(3, 'ITA', 1),
-(4, 'USA', 1),
-(5, 'MAR', 2),
-(6, 'JPN', 3),
-(7, 'MAR', 1),
-(8, 'FRA', 1),
-(9, 'ESP', 2),
-(10, 'USA', 1);
+INSERT INTO obtient (idCli, codeP, idVisa, dateObt, dateExp) VALUES
+(1, 'ITA', 1, '2025-01-15', '2025-07-15'),
+(2, 'USA', 2, '2025-02-01', '2026-02-01'),
+(3, 'ESP', 1, '2024-12-10', '2025-06-10'),
+(4, 'ITA', 1, '2025-01-20', '2025-07-20'),
+(5, 'JPN', 2, '2025-03-01', '2026-03-01'),
+(6, 'JPN', 3, '2025-01-10', '2026-01-10'),
+(7, 'MAR', 1, '2025-02-05', '2025-08-05'),
+(8, 'ESP', 1, '2025-01-12', '2025-07-12'),
+(9, 'USA', 2, '2025-02-25', '2026-02-25'),
+(10, 'ITA', 1, '2025-01-18', '2025-07-18');
 
 
 -- TABLE parle
