@@ -67,7 +67,8 @@ CREATE TABLE etape(
     depart int references ville(idVille),
     arrivee int references ville(idVille),
     dateDepart date NOT NULL,
-    dateArrivee date NOT NULL
+    dateArrivee date NOT NULL,
+    CONSTRAINT check_dates_etape CHECK (dateArrivee >= dateDepart)
 );
 
 CREATE TABLE voyage(
@@ -99,7 +100,8 @@ CREATE TABLE obtient(
     idVisa int references visa(idVisa),
     dateObt date NOT NULL,
     dateExp date NOT NULL,
-    primary key(idCli, codeP , idVisa)
+    primary key(idCli, codeP , idVisa),
+    CONSTRAINT check_dates_obtient CHECK (dateExp > dateObt)
 );
 
 CREATE TABLE parle(
