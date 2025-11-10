@@ -231,3 +231,49 @@ INSERT INTO parle (codeP, langue) VALUES
 ('MAR', 'Arabe'),
 ('MAR', 'Français'), -- deux langues
 ('USA', 'Espagnol'); -- même chose
+
+
+
+-- ==VUES==
+CREATE OR REPLACE VIEW activite_agence AS
+SELECT
+    a.idA,
+    a.nom AS agence,
+
+    -- Nombre de voyages en cours
+    COUNT(DISTINCT CASE
+        WHEN CURRENT_DATE BETWEEN v.dateDebut AND v.dateFin THEN v.idVoy
+    END) AS nb_voyages_en_cours,
+
+    -- Nombre de voyages ouverts à la réservation
+    COUNT(DISTINCT CASE
+        WHEN v.dateDebut > CURRENT_DATE THEN v.idVoy
+    END) AS nb_voyages_ouverts_resa,
+
+    -- Nombre de clients actuellement en voyage
+    COUNT(DISTINCT CASE
+        WHEN CURRENT_DATE BETWEEN v.dateDebut AND v.dateFin THEN f.idCli
+    END) AS nb_clients_en_voyage,
+
+    -- Nombre de réservations en cours
+    COUNT(DISTINCT CASE
+        WHEN v.dateDebut > CURRENT_DATE THEN f.idCli
+    END) AS nb_reservations_en_cours,
+
+    -- Revenu total de l'agence sur les 3 derniers mois
+    COALESCE(SUM(
+        CASE
+            WHEN v.dateDebut >= CURRENT_DATE - INTERVAL '3 months'
+            THEN v.PrixPersonne * (
+                SELECT COUNT(*) FROM fait f2 WHERE f2.idVoy = v.idVoy
+            )
+        END
+    ), 0) AS revenus_3_derniers_mois
+
+FROM agence a
+LEFT JOIN employe e ON e.Travaille = a.idA
+LEFT JOIN voyage v ON v.planifie_par = e.idEmp
+LEFT JOIN fait f ON f.idVoy = v.idVoy
+
+GROUP BY a.idA, a.nom
+ORDER BY a.nom;
