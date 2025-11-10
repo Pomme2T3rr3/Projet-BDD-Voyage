@@ -47,7 +47,9 @@ CREATE TABLE client(
     nat char(3),
     adr varchar(30),
     numtel varchar(13),
-    courriel varchar(25)
+    courriel varchar(25),
+    CONSTRAINT check_courriel CHECK (courriel LIKE '%@%.%'),
+    CONSTRAINT check_age CHECK (age >= 18)
 );
 
 CREATE TABLE employe(
@@ -77,7 +79,8 @@ CREATE TABLE voyage(
     dateFin date,
     PrixPersonne numeric(6,2),
     descriptif text,
-    planifie_par int references employe(idEmp)
+    planifie_par int references employe(idEmp),
+    CONSTRAINT check_dates_voyage CHECK (dateFin > dateDebut)
 );
 /*
  --- Creation de tables des associations ---
@@ -129,7 +132,7 @@ INSERT INTO pays (codeP, nom) VALUES
 -- TABLE ville
 INSERT INTO ville (nom, pays, descriptif) VALUES
 ('Paris', 'FRA', 'Capitale française'),
-('Lyon', 'FRA', 'Ville gastronomiqu'),
+('Lyon', 'FRA', 'Ville gastronomique'),
 ('Madrid', 'ESP', 'Capitale espagnole'),
 ('Barcelone', 'ESP', 'Ville côtière avec la Sagrada Familia'),
 ('Rome', 'ITA', 'Capitale italienne, sympa'),
