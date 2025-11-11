@@ -59,7 +59,9 @@ CREATE TABLE employe(
     siteLogin varchar(10),
     mdp varchar(8),
     Travaille int references agence(idA),
-    est_resp int references agence(idA)
+    est_resp int references agence(idA) UNIQUE,
+    CONSTRAINT check_resp_agence CHECK (est_resp IS NULL OR Travaille = est_resp )
+
 );
 
 CREATE TABLE etape(
