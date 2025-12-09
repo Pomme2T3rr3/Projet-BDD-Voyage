@@ -1,0 +1,107 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-image: url("fond_accueil.jpeg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    image-rendering: high-quality;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    color: #fff;
+    font-size: 3rem;
+    letter-spacing: 1px;
+    font-weight: 800;
+    text-shadow: 3px 4px 12px rgba(0, 0, 0, 0.75);
+}
+
+/* CONTENEUR CENTRAL */
+.welcome-container {
+    max-width: 950px;
+    width: 92%;
+    margin: 30px auto;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(6px);
+
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    box-shadow:
+        0 6px 22px rgba(0, 0, 0, 0.45),
+        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+
+    text-align: center;
+}
+
+.welcome-container h2 {
+    font-size: 1.9rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-container p {
+    color: #f2f2f2;
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+}
+
+/* Liste du menu */
+.menu-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: center;
+}
+
+/* Style unifié pour les liens */
+.menu-list a,
+.menu-item {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 600;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 12px;
+
+    background: rgba(60, 40, 25, 0.65); /* Brun premium translucide */
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.25);
+
+    transition: all 0.25s ease;
+    backdrop-filter: blur(5px);
+}
+
+/* Survol harmonisé */
+.menu-list a:hover,
+.menu-item:hover {
+    background: rgba(120, 75, 20, 0.95);
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, 0.55),
+        inset 0 1px 3px rgba(255, 255, 255, 0.25);
+}
