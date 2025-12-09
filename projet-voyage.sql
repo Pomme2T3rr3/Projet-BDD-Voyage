@@ -17,19 +17,22 @@ DROP TABLE IF EXISTS parle CASCADE;
 CREATE TABLE agence(
     idA serial primary key,
     nom varchar(25),
-    adresse text
+    adresse text,
+    idEmp int references employe(idEmp) UNIQUE,
+    CONSTRAINT est_employe_agence CHECK ( idResp IS NULL OR idResp IN (
+                                        SELECT idEmp FROM employe WHERE employe.idA = agence.idA ))
 );
 
 CREATE TABLE pays(
     codeP char(3) primary key,
-    nom varchar(25)
+    nom varchar(25),
+    descriptif text
 );
 
 CREATE TABLE ville(
     idVille serial primary key,
     nom varchar(20),
-    pays char(3) references pays(codeP),
-    descriptif text
+    pays char(3) references pays(codeP)
 );
 
 CREATE TABLE visa(
@@ -40,27 +43,26 @@ CREATE TABLE visa(
 
 CREATE TABLE client(
     idCli serial primary key,
-    nom varchar(20),
-    prenom varchar(15),
-    sexe char(1),
-    age int,
-    nat char(3),
-    adr varchar(30),
-    numtel varchar(13),
-    courriel varchar(25),
+    nom varchar(25) NOT NULL,
+    prenom varchar(25) NOT NULL,
+    sexe char(1) NOT NULL,
+    age int NOT NULL,
+    nat char(3) NOT NULL,
+    adr varchar(50) NOT NULL,
+    numtel varchar(13) NOT NULL,
+    courriel varchar(25) NOT NULL,
     CONSTRAINT check_courriel CHECK (courriel LIKE '%@%.%'),
     CONSTRAINT check_age CHECK (age >= 18)
 );
 
 CREATE TABLE employe(
     idEmp serial primary key,
-    nom varchar(20),
-    prenom varchar(15),
-    siteLogin varchar(10),
-    mdp varchar(8),
-    Travaille int references agence(idA),
-    est_resp int references agence(idA) UNIQUE,
-    CONSTRAINT check_resp_agence CHECK (est_resp IS NULL OR Travaille = est_resp )
+    nom varchar(25) NOT NULL,
+    prenom varchar(25) NOT NULL,
+    siteLogin varchar(25),
+    mdp varchar(50),
+    idA int references agence(idA),
+    CONSTRAINT check_longueur_mdp CHECK (LENGHT(mdp) >= 8),
 
 );
 
@@ -68,8 +70,8 @@ CREATE TABLE etape(
     idEt serial primary key,
     TyP varchar(20),
     transport varchar(15),
-    depart int references ville(idVille),
-    arrivee int references ville(idVille),
+    depart int references ville(idVille) NOT NULL,
+    arrivee int references ville(idVille) NOT NULL,
     dateDepart date NOT NULL,
     dateArrivee date NOT NULL,
     CONSTRAINT check_dates_etape CHECK (dateArrivee >= dateDepart)
@@ -77,8 +79,8 @@ CREATE TABLE etape(
 
 CREATE TABLE voyage(
     idVoy serial primary key,
-    dateDebut date,
-    dateFin date,
+    dateDebut date NOT NULL,
+    dateFin date NOT NULL,
     PrixPersonne numeric(6,2),
     descriptif text,
     planifie_par int references employe(idEmp),
@@ -124,27 +126,27 @@ INSERT INTO agence (nom, adresse) VALUES
 
 -- TABLE pays
 INSERT INTO pays (codeP, nom) VALUES
-('FRA', 'France'),
-('ESP', 'Espagne'),
-('ITA', 'Italie'),
-('USA', 'États-Unis'),
-('JPN', 'Japon'),
-('MAR', 'Maroc');
+('FRA', 'France', 'Pays de la gastronomie'),
+('ESP', 'Espagne', 'Beaucoup de soleil et beau temps'),
+('ITA', 'Italie', 'Pays de la pizza et des pâtes'),
+('USA', 'États-Unis', 'Pays du cinéma'),
+('JPN', 'Japon', 'Pays des nouvelles technologies'),
+('MAR', 'Maroc', 'Architectures originales et deserts à perte de vue');
 
 -- TABLE ville
 INSERT INTO ville (nom, pays, descriptif) VALUES
-('Paris', 'FRA', 'Capitale française'),
-('Lyon', 'FRA', 'Ville gastronomique'),
-('Madrid', 'ESP', 'Capitale espagnole'),
-('Barcelone', 'ESP', 'Ville côtière avec la Sagrada Familia'),
-('Rome', 'ITA', 'Capitale italienne, sympa'),
-('Venise', 'ITA', 'Ville romantique'),
-('New York', 'USA', 'Métropole mondiale, gratte-ciels'),
-('Los Angeles', 'USA', 'Ville du cinéma'),
-('Tokyo', 'JPN', 'Capitale moderne du Japon'),
-('Kyoto', 'JPN', 'Ancienne capitale, temples et traditions'),
-('Marrakech', 'MAR', 'Ville rouge, médina animée'),
-('Casablanca', 'MAR', 'Capitale économique du Maroc');
+('Paris', 'FRA'),
+('Lyon', 'FRA'),
+('Madrid', 'ESP'),
+('Barcelone', 'ESP'),
+('Rome', 'ITA'),
+('Venise', 'ITA'),
+('New York', 'USA'),
+('Los Angeles', 'USA'),
+('Tokyo', 'JPN'),
+('Kyoto', 'JPN'),
+('Marrakech', 'MAR'),
+('Casablanca', 'MAR');
 
 -- TABLE visa
 INSERT INTO visa (typev, prixVisa) VALUES
@@ -167,7 +169,7 @@ INSERT INTO client (nom, prenom, sexe, age, nat, adr, numtel, courriel) VALUES
 ('Lopez', 'Carlos', 'M', 41, 'ESP', 'Calle del Sol 25, Barcelone', '+34911223355', 'carlos.lopez@mail.es');
 
 -- TABLE employe
-INSERT INTO employe (nom, prenom, siteLogin, mdp, Travaille, est_resp) VALUES
+INSERT INTO employe (nom, prenom, siteLogin, mdp, idA, est_resp) VALUES
 ('Deneuville', 'Damian', 'ddamian', 'azerty12', 1, 1),
 ('Moreau', 'Jean', 'jmoreau', 'voyage1', 1, NULL),
 ('Lefevre', 'Paul', 'plefevre', 'passe123', 2, 2),
@@ -180,7 +182,14 @@ INSERT INTO voyage (dateDebut, dateFin, PrixPersonne, descriptif, planifie_par) 
 ('2025-03-01', '2025-03-10', 2300.00, 'Découverte du Japon', 5),
 ('2025-04-15', '2025-04-25', 1800.00, 'Voyage gastronomique en Espagne', 3),
 ('2025-05-05', '2025-05-15', 2100.00, 'Road trip aux États-Unis', 4),
-('2025-06-10', '2025-06-17', 1200.00, 'Séjour au Maroc', 2);
+('2025-06-10', '2025-06-17', 1200.00, 'Séjour au Maroc', 5),
+('2025-06-10', '2026-06-17', 1300.00, 'Séjour en France', 2),
+('2026-06-10', '2027-06-17', 1800.00, 'Séjour en Papouasie', 1),
+('2026-07-23', '2026-08-03', 900.00, 'Séjour au Groënland', 4),
+('2026-07-23', '2026-08-03', 900.00, 'Séjour en italie', 5),
+('2025-09-23', '2026-10-03', 4900.00, 'Séjour en Allemagne', 5),
+('2025-06-10', '2026-09-17', 1300.00, 'Séjour en France', 5),
+('2025-11-01', '2025-11-10', 2000.00, 'Mini-séjour test pour revenus agence 3', 5);
 
 -- TABLE etape
 INSERT INTO etape (TyP, transport, depart, arrivee, dateDepart, dateArrivee) VALUES
@@ -211,7 +220,17 @@ INSERT INTO fait (idCli, idVoy) VALUES
 (7, 5),
 (8, 3),
 (9, 4),
-(10, 5);
+(10, 5),
+(1, 6),
+(2, 7),
+(3, 7),
+(1, 8),
+(2, 8),
+(3, 8),
+(1, 12),
+(2, 12),
+(1, 11),
+(2, 10);
 
 -- TABLE obtient
 -- Quels clients ont obtenu quels visas
@@ -278,7 +297,7 @@ SELECT
     ), 0) AS revenus_3_derniers_mois
 
 FROM agence a
-LEFT JOIN employe e ON e.Travaille = a.idA
+LEFT JOIN employe e ON e.idA = a.idA
 LEFT JOIN voyage v ON v.planifie_par = e.idEmp
 LEFT JOIN fait f ON f.idVoy = v.idVoy
 
