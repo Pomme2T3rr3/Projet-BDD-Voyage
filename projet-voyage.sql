@@ -51,6 +51,8 @@ CREATE TABLE client(
     adr varchar(50) NOT NULL,
     numtel varchar(13) NOT NULL,
     courriel varchar(25) NOT NULL,
+    Clogin varchar(50) NOT NULL,
+    Cmdp varchar(25) NOT NULL,
     CONSTRAINT check_courriel CHECK (courriel LIKE '%@%.%'),
     CONSTRAINT check_age CHECK (age >= 18)
 );
@@ -119,13 +121,13 @@ CREATE TABLE parle(
 
 
 -- TABLE agence
-INSERT INTO agence (nom, adresse) VALUES
-('GlobeTrotter', '12 rue de la Paix, Paris'),
-('Voyage2000', '7 avenue de la Liberté, Lyon'),
-('Evasion360', '25 boulevard du Port, Marseille');
+INSERT INTO agence (nom, adresse, idEmp) VALUES
+('GlobeTrotter', '12 rue de la Paix, Paris', 1),
+('Voyage2000', '7 avenue de la Liberté, Lyon',3),
+('Evasion360', '25 boulevard du Port, Marseille',5);
 
 -- TABLE pays
-INSERT INTO pays (codeP, nom) VALUES
+INSERT INTO pays (codeP, nom, descriptif) VALUES
 ('FRA', 'France', 'Pays de la gastronomie'),
 ('ESP', 'Espagne', 'Beaucoup de soleil et beau temps'),
 ('ITA', 'Italie', 'Pays de la pizza et des pâtes'),
@@ -134,7 +136,7 @@ INSERT INTO pays (codeP, nom) VALUES
 ('MAR', 'Maroc', 'Architectures originales et deserts à perte de vue');
 
 -- TABLE ville
-INSERT INTO ville (nom, pays, descriptif) VALUES
+INSERT INTO ville (nom, pays) VALUES
 ('Paris', 'FRA'),
 ('Lyon', 'FRA'),
 ('Madrid', 'ESP'),
@@ -156,25 +158,25 @@ INSERT INTO visa (typev, prixVisa) VALUES
 ('Transit', 40);
 
 -- TABLE client
-INSERT INTO client (nom, prenom, sexe, age, nat, adr, numtel, courriel) VALUES
-('Durand', 'Alice', 'F', 28, 'FRA', '5 rue Victor Hugo, Paris', '+33645121212', 'alice.durand@mail.fr'),
-('Martin', 'Lucas', 'M', 35, 'FRA', '12 avenue Foch, Lyon', '+33688223344', 'lucas.martin@mail.fr'),
-('Garcia', 'Sofia', 'F', 42, 'ESP', '8 calle Mayor, Madrid', '+34915554444', 'sofia.garcia@mail.es'),
-('Rossi', 'Marco', 'M', 31, 'ITA', 'Via Roma 10, Rome', '+39066555123', 'marco.rossi@mail.it'),
-('Smith', 'John', 'M', 45, 'USA', '123 5th Ave, New York', '+12125551234', 'john.smith@mail.com'),
-('Tanaka', 'Yuki', 'F', 26, 'JPN', '2-3-5 Shibuya, Tokyo', '+81345551212', 'yuki.tanaka@mail.jp'),
-('Bennani', 'Sara', 'F', 33, 'MAR', '45 rue Mohamed V, Marrakech', '+212655123123', 'sara.bennani@mail.ma'),
-('Nguyen', 'Linh', 'F', 29, 'FRA', '3 rue de Provence, Lyon', '+33655887799', 'linh.nguyen@mail.fr'),
-('Dupont', 'Julien', 'M', 38, 'FRA', '1 rue de la Gare, Paris', '+33677554411', 'julien.dupont@mail.fr'),
-('Lopez', 'Carlos', 'M', 41, 'ESP', 'Calle del Sol 25, Barcelone', '+34911223355', 'carlos.lopez@mail.es');
+INSERT INTO client (nom, prenom, sexe, age, nat, adr, numtel, Clogin, Cmdp, courriel) VALUES
+('Durand', 'Alice', 'F', 28, 'FRA', '5 rue Victor Hugo, Paris', '+33645121212', 'adurand', 'Alice2024!', 'alice.durand@mail.fr'),
+('Martin', 'Lucas', 'M', 35, 'FRA', '12 avenue Foch, Lyon', '+33688223344', 'lmartin', 'Lucas#2024', 'lucas.martin@mail.fr'),
+('Garcia', 'Sofia', 'F', 42, 'ESP', '8 calle Mayor, Madrid', '+34915554444', 'sgarcia', 'Sofia@Madrid', 'sofia.garcia@mail.es'),
+('Rossi', 'Marco', 'M', 31, 'ITA', 'Via Roma 10, Rome', '+39066555123', 'mrossi', 'Marco!Roma31', 'marco.rossi@mail.it'),
+('Smith', 'John', 'M', 45, 'USA', '123 5th Ave, New York', '+12125551234', 'jsmith', 'John$NY2024', 'john.smith@mail.com'),
+('Tanaka', 'Yuki', 'F', 26, 'JPN', '2-3-5 Shibuya, Tokyo', '+81345551212', 'ytanaka', 'Yuki@Tokyo26', 'yuki.tanaka@mail.jp'),
+('Bennani', 'Sara', 'F', 33, 'MAR', '45 rue Mohamed V, Marrakech', '+212655123123', 'sbennani', 'Sara#Maroc33', 'sara.bennani@mail.ma'),
+('Nguyen', 'Linh', 'F', 29, 'FRA', '3 rue de Provence, Lyon', '+33655887799', 'lnguyen', 'Linh!Lyon29', 'linh.nguyen@mail.fr'),
+('Dupont', 'Julien', 'M', 38, 'FRA', '1 rue de la Gare, Paris', '+33677554411', 'jdupont', 'Julien@2024', 'julien.dupont@mail.fr'),
+('Lopez', 'Carlos', 'M', 41, 'ESP', 'Calle del Sol 25, Barcelone', '+34911223355', 'clopez', 'Carlos#BCN41', 'carlos.lopez@mail.es');
 
 -- TABLE employe
-INSERT INTO employe (nom, prenom, siteLogin, mdp, idA, est_resp) VALUES
-('Deneuville', 'Damian', 'ddamian', 'azerty12', 1, 1),
-('Moreau', 'Jean', 'jmoreau', 'voyage1', 1, NULL),
-('Lefevre', 'Paul', 'plefevre', 'passe123', 2, 2),
-('Dubois', 'Emma', 'edubois', 'soleil99', 2, NULL),
-('Petit', 'Nina', 'npetit', 'monde01', 3, 3);
+INSERT INTO employe (nom, prenom, siteLogin, mdp, idA) VALUES
+('Deneuville', 'Damian', 'ddamian', 'azerty12', 1),
+('Moreau', 'Jean', 'jmoreau', 'voyage1', 1),
+('Lefevre', 'Paul', 'plefevre', 'passe123', 2),
+('Dubois', 'Emma', 'edubois', 'soleil99', 2),
+('Petit', 'Nina', 'npetit', 'monde01', 3);
 
 -- TABLE voyage
 INSERT INTO voyage (dateDebut, dateFin, PrixPersonne, descriptif, planifie_par) VALUES
