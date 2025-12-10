@@ -1,3 +1,9 @@
+DROP TABLE IF EXISTS fait CASCADE;
+DROP TABLE IF EXISTS constitue CASCADE;
+DROP TABLE IF EXISTS obtient CASCADE;
+DROP TABLE IF EXISTS parle CASCADE;
+
+
 DROP TABLE IF EXISTS agence CASCADE;
 DROP TABLE IF EXISTS employe CASCADE;
 DROP TABLE IF EXISTS client CASCADE;
@@ -7,20 +13,39 @@ DROP TABLE IF EXISTS ville CASCADE;
 DROP TABLE IF EXISTS pays CASCADE;
 DROP TABLE IF EXISTS visa CASCADE;
 
-DROP TABLE IF EXISTS fait CASCADE;
-DROP TABLE IF EXISTS constitue CASCADE;
-DROP TABLE IF EXISTS obtient CASCADE;
-DROP TABLE IF EXISTS parle CASCADE;
-
-
 
 CREATE TABLE agence(
     idA serial primary key,
     nom varchar(25),
     adresse text,
-    idEmp int references employe(idEmp) UNIQUE,
-    CONSTRAINT est_employe_agence CHECK ( idResp IS NULL OR idResp IN (
-                                        SELECT idEmp FROM employe WHERE employe.idA = agence.idA ))
+    idEmp int 
+);
+
+CREATE TABLE employe(
+    idEmp serial primary key,
+    nom varchar(25) NOT NULL,
+    prenom varchar(25) NOT NULL,
+    siteLogin varchar(25),
+    mdp varchar(50),
+    idA int,
+    CONSTRAINT check_longueur_mdp CHECK ( mdp LIKE '________%')
+);
+
+CREATE TABLE client(
+    idCli serial primary key,
+    nom varchar(25) NOT NULL,
+    prenom varchar(25) NOT NULL,
+    sexe char(1) NOT NULL,
+    age int NOT NULL,
+    nat char(3) NOT NULL,
+    adr varchar(50) NOT NULL,
+    numtel varchar(13) NOT NULL,
+    courriel varchar(25) NOT NULL,
+    Clogin varchar(50) NOT NULL,
+    Cmdp varchar(25) NOT NULL,
+    CONSTRAINT check_courriel CHECK (courriel LIKE '%@%.%'),
+    CONSTRAINT check_age CHECK (age >= 18),
+    CONSTRAINT check_longueur_cmdp CHECK ( Cmdp LIKE '________%')
 );
 
 CREATE TABLE pays(
@@ -38,34 +63,17 @@ CREATE TABLE ville(
 CREATE TABLE visa(
     idVisa serial primary key,
     typev varchar(10),
-    prixVisa int
+    prixVisa int NOT NULL
 );
 
-CREATE TABLE client(
-    idCli serial primary key,
-    nom varchar(25) NOT NULL,
-    prenom varchar(25) NOT NULL,
-    sexe char(1) NOT NULL,
-    age int NOT NULL,
-    nat char(3) NOT NULL,
-    adr varchar(50) NOT NULL,
-    numtel varchar(13) NOT NULL,
-    courriel varchar(25) NOT NULL,
-    Clogin varchar(50) NOT NULL,
-    Cmdp varchar(25) NOT NULL,
-    CONSTRAINT check_courriel CHECK (courriel LIKE '%@%.%'),
-    CONSTRAINT check_age CHECK (age >= 18)
-);
-
-CREATE TABLE employe(
-    idEmp serial primary key,
-    nom varchar(25) NOT NULL,
-    prenom varchar(25) NOT NULL,
-    siteLogin varchar(25),
-    mdp varchar(50),
-    idA int references agence(idA),
-    CONSTRAINT check_longueur_mdp CHECK (LENGHT(mdp) >= 8),
-
+CREATE TABLE voyage(
+    idVoy serial primary key,
+    dateDebut date NOT NULL,
+    dateFin date NOT NULL,
+    PrixPersonne numeric(6,2),
+    descriptif text,
+    planifie_par int references employe(idEmp),
+    CONSTRAINT check_dates_voyage CHECK (dateFin > dateDebut)
 );
 
 CREATE TABLE etape(
@@ -79,15 +87,6 @@ CREATE TABLE etape(
     CONSTRAINT check_dates_etape CHECK (dateArrivee >= dateDepart)
 );
 
-CREATE TABLE voyage(
-    idVoy serial primary key,
-    dateDebut date NOT NULL,
-    dateFin date NOT NULL,
-    PrixPersonne numeric(6,2),
-    descriptif text,
-    planifie_par int references employe(idEmp),
-    CONSTRAINT check_dates_voyage CHECK (dateFin > dateDebut)
-);
 /*
  --- Creation de tables des associations ---
 */
@@ -119,12 +118,51 @@ CREATE TABLE parle(
     primary key(codeP, langue)
 );
 
+------------------------------------------------------------
+-- CONTRAINTES CIRCULAIRES A RENDRE DEFERRABLE
+------------------------------------------------------------
+/*
+ - Ces contraintes suivantes vont etre reportées après la transaction.
+
+ - La transaction débute à "BEGIN" et s'arrete jusqu'à "COMMIT"
+*/
+ALTER TABLE employe
+    ADD CONSTRAINT fk_employe_agence
+    FOREIGN KEY (idA)
+    REFERENCES agence(idA)
+    DEFERRABLE INITIALLY DEFERRED;
+
+ALTER TABLE agence
+    ADD CONSTRAINT fk_agence_directeur
+    FOREIGN KEY (idEmp)
+    REFERENCES employe(idEmp)
+    DEFERRABLE INITIALLY DEFERRED;
+
+------------------------------------------------------------
+-- INSERTIONS AVEC CONTRAINTES DEFERREES
+------------------------------------------------------------
+
+BEGIN;
+SET CONSTRAINTS ALL DEFERRED;
 
 -- TABLE agence
-INSERT INTO agence (nom, adresse, idEmp) VALUES
-('GlobeTrotter', '12 rue de la Paix, Paris', 1),
-('Voyage2000', '7 avenue de la Liberté, Lyon',3),
-('Evasion360', '25 boulevard du Port, Marseille',5);
+INSERT INTO agence (nom, adresse) VALUES
+('GlobeTrotter', '12 rue de la Paix, Paris'),
+('Voyage2000', '7 avenue de la Liberté, Lyon'),
+('Evasion360', '25 boulevard du Port, Marseille');
+
+-- TABLE employe
+INSERT INTO employe (nom, prenom, siteLogin, mdp, idA) VALUES
+('Deneuville', 'Damian', 'ddamian', 'azerty12', 1),
+('Moreau', 'Jean', 'jmoreau', 'voyage12', 1),
+('Lefevre', 'Paul', 'plefevre', 'passe123', 2),
+('Dubois', 'Emma', 'edubois', 'soleil99', 2),
+('Petit', 'Nina', 'npetit', 'monde012', 3);
+
+-- UPDATE des directeurs d'agences
+UPDATE agence SET idEmp = 1 WHERE idA = 1;
+UPDATE agence SET idEmp = 3 WHERE idA = 2;
+UPDATE agence SET idEmp = 5 WHERE idA = 3;
 
 -- TABLE pays
 INSERT INTO pays (codeP, nom, descriptif) VALUES
@@ -169,14 +207,6 @@ INSERT INTO client (nom, prenom, sexe, age, nat, adr, numtel, Clogin, Cmdp, cour
 ('Nguyen', 'Linh', 'F', 29, 'FRA', '3 rue de Provence, Lyon', '+33655887799', 'lnguyen', 'Linh!Lyon29', 'linh.nguyen@mail.fr'),
 ('Dupont', 'Julien', 'M', 38, 'FRA', '1 rue de la Gare, Paris', '+33677554411', 'jdupont', 'Julien@2024', 'julien.dupont@mail.fr'),
 ('Lopez', 'Carlos', 'M', 41, 'ESP', 'Calle del Sol 25, Barcelone', '+34911223355', 'clopez', 'Carlos#BCN41', 'carlos.lopez@mail.es');
-
--- TABLE employe
-INSERT INTO employe (nom, prenom, siteLogin, mdp, idA) VALUES
-('Deneuville', 'Damian', 'ddamian', 'azerty12', 1),
-('Moreau', 'Jean', 'jmoreau', 'voyage1', 1),
-('Lefevre', 'Paul', 'plefevre', 'passe123', 2),
-('Dubois', 'Emma', 'edubois', 'soleil99', 2),
-('Petit', 'Nina', 'npetit', 'monde01', 3);
 
 -- TABLE voyage
 INSERT INTO voyage (dateDebut, dateFin, PrixPersonne, descriptif, planifie_par) VALUES
@@ -260,6 +290,7 @@ INSERT INTO parle (codeP, langue) VALUES
 ('MAR', 'Français'), -- deux langues
 ('USA', 'Espagnol'); -- même chose
 
+COMMIT;
 
 
 -- ==VUES==
