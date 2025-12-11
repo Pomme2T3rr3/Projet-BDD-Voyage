@@ -14,21 +14,21 @@ def accueil():
     return render_template("accueil.html")
 
 # Page de connexion
-@app.route("/profil")
+@app.route("/connexion")
 def connexion():
     return render_template("connexion_profil.html") 
 
-# Pas fonctionnel pour l'instant
+# Verifie le login et le mot de passe  
 @app.route("/verification", methods=["GET", "POST"])
 def verification():
     lst_client = []
     lst_employe = []
     
-    login = request.form.get["num_login"]
-    mdp = request.form.get["mdp"]
+    login = request.form.get("num_login")
+    mdp = request.form.get("mdp")
 
     if not login or not mdp:
-        return redirect(url_for("connexion_profile.html"))
+        return render_template("connexion_profile.html")
 
     with conn.cursor() as cur:
         cur.execute("SELECT Clogin, Cmdp FROM client;")
@@ -43,13 +43,30 @@ def verification():
         cur.close()
 
     if [login, mdp] in lst_client:
-        return render_template("espace_client.html")
+        return redirect(url_for('profil_client', login=login))
     
     elif [login, mdp] in lst_employe:
-        return render_template("espace_pro.html")
+        return redirect(url_for('espace_pro', login=login))
     else : 
-        return redirect(url_for("connexion_profile.html"))
+        return render_template("connexion_profile.html")
 
+# Fait à l'arrache mais fonctionnel  
+@app.route("/profil_client<string:login>")
+def espace_client(login):
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM client WHERE Clogin = %s;',(login,))
+        tmp = cur.fetchone()
+        cur.close()
+    return render_template("espace_client.html", cli = tmp)
+
+# Fait à l'arrache mais fonctionnel
+@app.route("/profil_pro<string:login>")
+def espace_pro(login):
+    with conn.cursor() as cur:
+        cur.execute('SELECT * FROM employe WHERE sitelogin = %s;',(login,))
+        tmp = cur.fetchone()
+        cur.close()
+    return render_template("espace_pro.html", emp = tmp)
 
 # pas fonctionnel
 @app.route("/client", methods=["GET", "POST"])
