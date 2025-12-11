@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+        <title>Connexion - Bon Voyage</title>
+    </head>
+    <header>
+        <h1>Bonjour {{ emp[2] }} {{ emp[1] }}</h1>
+        <nav class="menu-list">
+            <a href="/offres">consulter les offres de voyage</a>
+            
+            <a href="/type-production">Gérer les Types de Production</a>
+            
+            <a href="/connexion" class="menu-item">Mon Profil</a>
+
+            <a href="/deconnexion">Déconnexion</a>
+        </nav>
+    </header>
+</html>
