@@ -63,7 +63,7 @@ def verification():
         """
         SELECT idCli
         FROM client
-        WHERE Clogin = %s AND mdp = %s
+        WHERE Clogin = %s AND Cmdp = %s
         """,
         (login, mdp),
     )
@@ -74,7 +74,7 @@ def verification():
         session["client"] = cli
         cur.close()
         conn.close()
-        return redirect(url_for("profil_client"), cli=cli)
+        return redirect(url_for("espace_client", login=cli[0]))
 
     cur.close()
     conn.close()
@@ -85,8 +85,11 @@ def verification():
 # Fait à l'arrache mais fonctionnel
 @app.route("/profil_client<string:login>")
 def espace_client(login):
+    if "client" not in session:
+        return redirect("/connexion")
+    
     with conn.cursor() as cur:
-        cur.execute("SELECT * FROM client WHERE Clogin = %s;", (login,))
+        cur.execute("SELECT * FROM client WHERE idCli = %s;", (login,))
         tmp = cur.fetchone()
         cur.close()
     return render_template("espace_client.html", cli=tmp)
