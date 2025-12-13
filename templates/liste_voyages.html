@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Voyages - Bon Voyage</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+
+    <body>
+        <header>
+            <h1>Voyages de votre agence</h1>
+        </header>
+
+        <div class="welcome-container">
+            <a href="/voyage/ajouter" class="menu-item">➕ Créer un voyage</a>
+
+            <table class="voyages-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Coût (€)</th>
+                        <th>Date début</th>
+                        <th>Date fin</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in voyages %}
+                    <tr>
+                        <td>{{ v[0] }}</td>
+                        <td>{{ v[1] }}</td>
+                        <td>{{ v[2] }}</td>
+                        <td>{{ v[3] }}</td>
+                        <td>
+                            <a href="/voyage/{{ v[0] }}/edit">✏️</a>
+                            <a
+                                href="/voyage/{{ v[0] }}/delete"
+                                onclick="return confirm('Supprimer ce voyage ?')"
+                                >🗑️</a
+                            >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
