@@ -1,8 +1,16 @@
-from flask import Flask, redirect, render_template, request, url_for  # type: ignore
+from flask import (  # type: ignore
+    Flask,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 import db
 
 app = Flask(__name__)
+app.secret_key = "secret_key_bon_voyage"
 
 # Connexion à la base de données
 conn = db.connect()
@@ -13,84 +21,131 @@ conn = db.connect()
 def accueil():
     return render_template("accueil.html")
 
+
 # Page de connexion
 @app.route("/connexion")
 def connexion():
-    return render_template("connexion_profil.html") 
+    return render_template("connexion_profil.html")
 
-# Verifie le login et le mot de passe  
+
+# Verifie le login et le mot de passe
 @app.route("/verification", methods=["GET", "POST"])
 def verification():
-    lst_client = []
-    lst_employe = []
-    
     login = request.form.get("num_login")
     mdp = request.form.get("mdp")
 
     if not login or not mdp:
-        return render_template("connexion_profile.html")
+        return render_template("connexion_profil.html")
 
-    with conn.cursor() as cur:
-        cur.execute("SELECT Clogin, Cmdp FROM client;")
-        for i in cur.fetchall():
-            lst_client.append([i[0],i[1]])
+    conn = db.connect()
+    cur = conn.cursor()
+
+    # employé
+    cur.execute(
+        """
+        SELECT idEMP, nom, prenom, idA
+        FROM employe
+        WHERE siteLogin = %s AND mdp = %s
+        """,
+        (login, mdp),
+    )
+
+    emp = cur.fetchone()
+
+    if emp:
+        session["emp"] = emp
         cur.close()
-    
-    with conn.cursor() as cur:
-        cur.execute("SELECT sitelogin, mdp FROM employe;")
-        for i in cur.fetchall():
-            lst_employe.append([i[0],i[1]])
+        conn.close()
+        return redirect(url_for("espace_pro", login=emp[0]))
+
+    # client
+    cur.execute(
+        """
+        SELECT idCli
+        FROM client
+        WHERE Clogin = %s AND mdp = %s
+        """,
+        (login, mdp),
+    )
+
+    cli = cur.fetchone()
+
+    if cli:
+        session["client"] = cli
         cur.close()
+        conn.close()
+        return redirect(url_for("profil_client"), cli=cli)
 
-    if [login, mdp] in lst_client:
-        return redirect(url_for('profil_client', login=login))
-    
-    elif [login, mdp] in lst_employe:
-        return redirect(url_for('espace_pro', login=login))
-    else : 
-        return render_template("connexion_profile.html")
+    cur.close()
+    conn.close()
 
-# Fait à l'arrache mais fonctionnel  
+    return render_template("connexion_profil.html")
+
+
+# Fait à l'arrache mais fonctionnel
 @app.route("/profil_client<string:login>")
 def espace_client(login):
     with conn.cursor() as cur:
-        cur.execute('SELECT * FROM client WHERE Clogin = %s;',(login,))
+        cur.execute("SELECT * FROM client WHERE Clogin = %s;", (login,))
         tmp = cur.fetchone()
         cur.close()
-    return render_template("espace_client.html", cli = tmp)
+    return render_template("espace_client.html", cli=tmp)
+
 
 # Fait à l'arrache mais fonctionnel
 @app.route("/profil_pro<string:login>")
 def espace_pro(login):
     with conn.cursor() as cur:
-        cur.execute('SELECT * FROM employe WHERE sitelogin = %s;',(login,))
+        cur.execute("SELECT * FROM employe WHERE sitelogin = %s;", (login,))
         tmp = cur.fetchone()
         cur.close()
-    return render_template("espace_pro.html", emp = tmp)
+    return render_template("espace_pro.html", emp=tmp)
 
-# pas fonctionnel
-@app.route("/client", methods=["GET", "POST"])
-def manage_client():
-    if request.method == "POST":
-        nom = request.form["nom"]
-        prenom = request.form["prenom"]
 
-        with conn.cursor() as cur:
-            cur.execute(
-                """
-                INSERT INTO client (nom, prenom, sex, age, nat, adr, numtel, courriel)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (nom, prenom),
-            )
+@app.route("/offres")
+def liste_voyages():
+    if "emp" not in session:
+        return redirect("/connexion")
 
-        return redirect(url_for("manage_client"))
+    emp = session["emp"]
+    id_emp = emp[0]
 
-    with conn.cursor() as cur:
-        cur.execute("SELECT * FROM client")
-        client = cur.fetchall()
+    conn = db.connect()
+    cur = conn.cursor()
 
-    return render_template("client.html", client=client)
+    # Récupérer l'agence de l'employé
+    cur.execute(
+        """
+        SELECT idA
+        FROM employe
+        WHERE idEmp = %s
+    """,
+        (id_emp,),
+    )
+
+    row = cur.fetchone()
+
+    if row is None:
+        return "Erreur, employé sans agence", 400
+    idA = row[0]
+
+    # Récupérer les voyages
+    cur.execute(
+        """
+        SELECT v.idVoy, v.PrixPersonne, v.dateDebut, v.dateFin, v.descriptif
+        FROM voyage v
+        JOIN employe e ON v.planifie_par = e.idEmp
+        WHERE e.idA = %s
+        ORDER BY v.dateDebut
+        """,
+        (idA,),
+    )
+    voyages = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("liste_voyages.html", emp=emp, voyages=voyages)
 
 
 if __name__ == "__main__":

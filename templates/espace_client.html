@@ -10,10 +10,10 @@
         <title>Connexion - Bon Voyage</title>
     </head>
     <header>
-        <h1>Bonjour {{ cli[2] }} {{ cli[1] }}</h1>
+        <h1>Bonjour {{ cli.prenom }} {{ cli.nom }}</h1>
         <nav class="menu-list">
             <a href="/periodicite">Consulter ses voyages</a>
-            <a href="/type-production">Modifier ces informations persos</a> 
+            <a href="/type-production">Modifier ces informations persos</a>
             <a href="/connexion" class="menu-item">???</a>
             <a href="/deconnexion">Déconnexion</a>
         </nav>
