@@ -148,5 +148,37 @@ def liste_voyages():
     return render_template("liste_voyages.html", emp=emp, voyages=voyages)
 
 
+@app.route("/voyage/ajouter", methods=["Get", "POST"])
+def ajouter_voyage():
+    if "emp" not in session:
+        return redirect("/connexion")
+
+    emp = session["emp"]
+    id_emp = emp[0]
+
+    if request.method == "POST":
+        dateDebut = request.form.get("dateDebut")
+        dateFin = request.form.get("dateFin")
+        prix = request.form.get("PrixPersonne")
+        descriptif = request.form.get("descriptif")
+
+        conn = db.connect()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO voyage (dateDebut, dateFin, PrixPersonne, descriptif, planifie_par)
+            VALUES(%s, %s, %s, %s, %s)
+            """,
+            (dateDebut, dateFin, prix, descriptif, id_emp),
+        )
+
+        conn.commit()
+        conn.close()
+        cur.close()
+        return redirect("/offres")
+
+    return render_template("ajout_edit_voyage.html", action="Ajouter")
+
+
 if __name__ == "__main__":
     app.run(debug=True)

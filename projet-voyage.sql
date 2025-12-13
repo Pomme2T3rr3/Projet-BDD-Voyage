@@ -18,7 +18,7 @@ CREATE TABLE agence(
     idA serial primary key,
     nom varchar(25),
     adresse text,
-    idEmp int 
+    idEmp int
 );
 
 CREATE TABLE employe(
@@ -70,7 +70,7 @@ CREATE TABLE voyage(
     idVoy serial primary key,
     dateDebut date NOT NULL,
     dateFin date NOT NULL,
-    PrixPersonne numeric(6,2),
+    PrixPersonne numeric(6,2) NOT NULL,
     descriptif text,
     planifie_par int references employe(idEmp),
     CONSTRAINT check_dates_voyage CHECK (dateFin > dateDebut)
