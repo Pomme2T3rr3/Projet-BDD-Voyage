@@ -7,13 +7,13 @@ from flask import (  # type: ignore
     url_for,
 )
 
-import db2
+import db
 
 app = Flask(__name__)
 app.secret_key = "secret_key_bon_voyage"
 
 # Connexion à la base de données
-conn = db2.connect()
+conn = db.connect()
 
 
 # Page d'accueil
@@ -37,7 +37,7 @@ def verification():
     if not login or not mdp:
         return render_template("connexion_profil.html")
 
-    conn = db2.connect()
+    conn = db.connect()
     cur = conn.cursor()
 
     # employé
@@ -90,7 +90,7 @@ def voyage(ID):
     if "client" not in session and ("emp" not in session):
         return redirect(url_for("connexion"))
     
-    conn = db2.connect()
+    conn = db.connect()
     cur = conn.cursor()
 
     cur.execute("""
@@ -166,7 +166,7 @@ def compte_client():
 
 
     idCli = session["client"][0]
-    conn = db2.connect()
+    conn = db.connect()
     cur = conn.cursor()
 
 
@@ -215,7 +215,7 @@ def offres_client():
         redirect("/connexion")
 
     cli = session["client"]
-    conn = db2.connect()
+    conn = db.connect()
     cur = conn.cursor()
     # Récupérer les voyages
     cur.execute(
@@ -264,7 +264,7 @@ def liste_voyages():
     emp = session["emp"]
     id_emp = emp[0]
 
-    conn = db2.connect()
+    conn = db.connect()
     cur = conn.cursor()
 
     # Récupérer l'agence de l'employé
@@ -315,7 +315,7 @@ def ajouter_voyage():
         prix = request.form.get("PrixPersonne")
         descriptif = request.form.get("descriptif")
 
-        conn = db2.connect()
+        conn = db.connect()
         cur = conn.cursor()
         cur.execute(
             """
