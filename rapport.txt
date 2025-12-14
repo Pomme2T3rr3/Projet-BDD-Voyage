@@ -1,5 +1,5 @@
 Rapport de Projet : Bon Voyage !
-1.  Présentation du projet
+Présentation du projet
 Objectif :
 Ce projet consiste à développer un site web de gestion de voyages permettant aux employés d’une agence (de voyage) de :
 Créer et gérer des voyages et plus précisément les étapes qui les compose
@@ -51,4 +51,4 @@ SELECT
         WHERE c.idVoy = %s
         ORDER BY e.dateDepart
 
-EXPLIQUER LA REQUETE
+Cette requête a pour objectif d’afficher le détail complet d’un voyage, incluant toutes les étapes qui le constituent, triées dans l’ordre logique du voyage. D’abord, on sélectionne tous les attributs que l’ont veut afficher, venant de la table « etape ». Ensuite, on « etape » sur « voyage » et « etape » sur les villes de départ et d’arrivée. Enfin, on filtre sur le voyage demandé, et on trie les étapes dans l’ordres pour le voyage sélectionné.
