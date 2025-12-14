@@ -7,13 +7,13 @@ from flask import (  # type: ignore
     url_for,
 )
 
-import db
+import db2
 
 app = Flask(__name__)
 app.secret_key = "secret_key_bon_voyage"
 
 # Connexion à la base de données
-conn = db.connect()
+conn = db2.connect()
 
 
 # Page d'accueil
@@ -37,7 +37,7 @@ def verification():
     if not login or not mdp:
         return render_template("connexion_profil.html")
 
-    conn = db.connect()
+    conn = db2.connect()
     cur = conn.cursor()
 
     # employé
@@ -90,7 +90,7 @@ def voyage(ID):
     if "client" not in session and ("emp" not in session):
         return redirect(url_for("connexion"))
     
-    conn = db.connect()
+    conn = db2.connect()
     cur = conn.cursor()
 
     cur.execute("""
@@ -166,7 +166,7 @@ def compte_client():
 
 
     idCli = session["client"][0]
-    conn = db.connect()
+    conn = db2.connect()
     cur = conn.cursor()
 
 
@@ -209,6 +209,35 @@ def compte_client():
 
     return render_template("Mon_compte.html", client=client,reservations=reservations,)
 
+@app.route("/offres_client")
+def offres_client():
+    if "client" not in session:
+        redirect("/connexion")
+
+    cli = session["client"]
+    conn = db2.connect()
+    cur = conn.cursor()
+    # Récupérer les voyages
+    cur.execute(
+        """
+        SELECT v.idVoy, v.PrixPersonne, v.dateDebut, v.dateFin, v.descriptif, a.nom
+        FROM voyage v
+        JOIN employe e ON v.planifie_par = e.idEmp
+        JOIN agence a ON e.idA = a.idA
+        WHERE v.dateDebut >= CURRENT_DATE
+        ORDER BY v.dateDebut
+        """
+        )
+    voyages = cur.fetchall()
+    print(voyages)
+
+    cur.close()
+    conn.close()
+
+    return render_template("offres_client.html", cli=cli,voyages=voyages)
+
+
+
 
 #####################   Fin : Fonctions pour Espace Client   ########################################
 #####################################################################################################
@@ -228,13 +257,14 @@ def espace_pro(login):
 
 @app.route("/offres")
 def liste_voyages():
-    if "emp" not in session:
+    if "emp" not in session and "client" not in session:
         return redirect("/connexion")
 
+    
     emp = session["emp"]
     id_emp = emp[0]
 
-    conn = db.connect()
+    conn = db2.connect()
     cur = conn.cursor()
 
     # Récupérer l'agence de l'employé
@@ -243,7 +273,7 @@ def liste_voyages():
         SELECT idA
         FROM employe
         WHERE idEmp = %s
-    """,
+        """,
         (id_emp,),
     )
 
@@ -270,8 +300,7 @@ def liste_voyages():
     conn.close()
 
     return render_template("liste_voyages.html", emp=emp, voyages=voyages)
-
-
+    
 @app.route("/voyage/ajouter", methods=["Get", "POST"])
 def ajouter_voyage():
     if "emp" not in session:
@@ -286,7 +315,7 @@ def ajouter_voyage():
         prix = request.form.get("PrixPersonne")
         descriptif = request.form.get("descriptif")
 
-        conn = db.connect()
+        conn = db2.connect()
         cur = conn.cursor()
         cur.execute(
             """

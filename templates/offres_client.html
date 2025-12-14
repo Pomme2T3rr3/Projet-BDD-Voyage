@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Voyages - Bon Voyage</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+
+    <body>
+        {% if cli %}
+        <header>
+            <h1>Nos offres de voyages</h1>
+        </header>
+
+        <div class="welcome-container">
+
+            <table class="voyages-table">
+                <thead>
+                    <tr>
+                        <th>Agence</th>
+                        <th>Descriptif</th>
+                        <th>ID</th>
+                        <th>Date début</th>
+                        <th>Date fin</th>
+                        <th>Coût (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in voyages %}
+                    <tr>
+                        <td>{{ v[5] }}</td>
+                        <td>{{ v[4] }}</td>
+                        <td><a href="/voyage_{{ v[0] }}">{{ v[0] }}</a></td>
+                        <td>{{ v[2] }}</td>
+                        <td>{{ v[3] }}</td>
+                        <td>{{ v[1] }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </body>
+</html>
