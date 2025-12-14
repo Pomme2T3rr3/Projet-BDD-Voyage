@@ -81,6 +81,71 @@ def verification():
 
     return render_template("connexion_profil.html")
 
+# Affiche les détails et les étapes du voyage Pas fini et CKC 
+@app.route("/voyage_<int:ID>")
+def voyage(ID):
+    if ID == 0:
+        return "Erreur, cette page n'existe pas. ", 404
+    
+    """if "client" not in session and ("emp" not in session):
+        return redirect(url_for("connexion"))"""
+    
+    conn = db.connect()
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT idVoy, descriptif, dateDebut, dateFin, PrixPersonne
+        FROM voyage
+        WHERE idVoy = %s
+        ORDER BY dateDebut
+    """,(ID,))
+    rows = cur.fetchall()
+
+    voyages = []
+
+    for v in rows:
+        idVoy = v[0]
+
+        # Étapes
+        cur.execute("""
+            SELECT idEt 
+            FROM constitue
+            WHERE idVoy = %s
+            ORDER BY idEt
+        """, (idVoy,))
+        etapes = [e[0] for e in cur.fetchall()]
+
+        # Visas (CKC)
+        """"
+        cur.execute(""
+            SELECT v.nomVisa
+            FROM visa v
+            JOIN voyage_visa vv ON v.idVisa = vv.idVisa
+            WHERE vv.idVoy = %s
+        "", (idVoy,))
+        visas = [vi[0] for vi in cur.fetchall()]"""
+
+        voyages.append({
+            "idVoy": idVoy,
+            "descriptif": v[1],
+            "dateDebut": v[2],
+            "dateFin": v[3],
+            "prix": v[4],
+            "etapes": etapes
+            #"visas": visas
+        })
+
+    cur.close()
+    conn.close()
+
+    return render_template("voyage.html", voyages=voyages)
+
+
+
+####################################################################################################
+#####################   Fonctions pour Espace Client   #############################################
+
+
 
 # Fait à l'arrache mais fonctionnel
 @app.route("/profil_client<string:login>")
@@ -94,10 +159,66 @@ def espace_client(login):
         cur.close()
     return render_template("espace_client.html", cli=tmp)
 
+@app.route("/Mon_compte", methods=["GET", "POST"])
+def compte_client():
+    if "client" not in session:
+        return redirect("/connexion")
+
+
+    idCli = session["client"][0]
+    conn = db.connect()
+    cur = conn.cursor()
+
+
+    # Mise à jour des infos personnelles
+    if request.method == "POST":
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        email = request.form.get("courriel")
+
+
+        cur.execute(
+            """
+            UPDATE client
+            SET nom = %s, prenom = %s, courriel = %s
+            WHERE idCli = %s
+            """,(nom, prenom, email, idCli),)
+        conn.commit()
+
+
+    # Infos client
+    cur.execute("SELECT nom, prenom, courriel FROM client WHERE idCli = %s", (idCli,))
+    client = cur.fetchone()
+
+
+    # Réservations
+    cur.execute(
+    """
+    SELECT f.idVoy,v.descriptif, v.PrixPersonne, v.dateDebut, v.dateFin
+    FROM fait f
+    JOIN voyage v ON f.idVoy = v.idVoy
+    WHERE f.idCli = %s
+    ORDER BY v.dateDebut DESC
+    """,(idCli,),)
+    reservations = cur.fetchall()
+
+
+    cur.close()
+    conn.close()
+
+
+    return render_template("Mon_compte.html", client=client,reservations=reservations,)
+
+
+#####################   Fin : Fonctions pour Espace Client   ########################################
+#####################################################################################################
 
 # Fait à l'arrache mais fonctionnel
 @app.route("/profil_pro<string:login>")
 def espace_pro(login):
+    if "emp" not in session:
+        return redirect("/connexion")
+
     with conn.cursor() as cur:
         cur.execute("SELECT * FROM employe WHERE sitelogin = %s;", (login,))
         tmp = cur.fetchone()

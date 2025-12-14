@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Voyages disponibles</title>
+    <style>
+        body { font-family: Arial; }
+        .voyage {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        h2 { margin-top: 0; }
+        ul { margin: 5px 0; }
+        .prix {
+            font-weight: bold;
+            color: darkgreen;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Nos voyages</h1>
+
+{% for v in voyages %}
+<div class="voyage">
+
+    <h2>{{ v.descriptif }}</h2>
+
+    <p>
+        <strong>Dates :</strong>
+        du {{ v.dateDebut }} au {{ v.dateFin }}
+    </p>
+
+    <p class="prix">
+        Prix par personne : {{ v.prix }} €
+    </p>
+
+    <h3>Étapes du voyage</h3>
+    {% if v.etapes %}
+        <ul>
+            {% for e in v.etapes %}
+                <li>{{ e }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune étape renseignée.</p>
+    {% endif %}
+
+    <h3>Visas requis</h3>
+    {% if v.visas %}
+        <ul>
+            {% for visa in v.visas %}
+                <li>{{ visa }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun visa requis.</p>
+    {% endif %}
+
+</div>
+{% endfor %}
+
+</body>
+</html>

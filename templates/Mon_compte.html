@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Mon compte</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+    <body>
+
+
+    <h1>Mon compte utilisateur</h1>
+
+
+    <h2>Informations personnelles</h2>
+    <form method="POST">
+        <label>Nom :</label><br>
+        <input type="text" name="nom" value="{{ client[0] }}" required><br><br>
+
+
+        <label>Prénom :</label><br>
+        <input type="text" name="prenom" value="{{ client[1] }}" required><br><br>
+
+
+        <label>Email :</label><br>
+        <input type="email" name="email" value="{{ client[2] }}" required><br><br>
+
+
+        <button type="submit">Mettre à jour</button>
+    </form>
+
+
+    <hr>
+
+
+    <h2>Mes réservations</h2>
+
+
+    {% if reservations %}
+    <table class="voyages-table">
+        <tr>
+            <th>Iden. Voyage</th>
+            <th>Voyage</th>
+            <th>Coût (€)</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            
+        </tr>
+    {% for r in reservations %}
+        <tr>
+            <td>
+                <a href="/voyage/{{ r[0] }}">{{ r[0] }}</a>
+            </td>
+            <td>{{ r[1] }}</td>
+            <td>{{ r[2] }}</td>
+            <td>{{ r[3] }}</td>
+            <td>{{ r[4] }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    {% else %}
+    <p>Aucune réservation trouvée.</p>
+    {% endif %}
+    
+    </body>
+</html>
