@@ -3,28 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <title>Voyages disponibles</title>
-        <style>
-            body {
-                font-family: Arial;
-            }
-            .voyage {
-                border: 1px solid #ccc;
-                padding: 15px;
-                margin-bottom: 20px;
-                border-radius: 8px;
-            }
-            h2 {
-                margin-top: 0;
-            }
-            ul {
-                margin: 5px 0;
-            }
-            .prix {
-                font-weight: bold;
-                color: darkgreen;
-                font-size: 1.1em;
-            }
-        </style>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
     </head>
     <body>
         <h1>{{ voyage.descriptif }}</h1>
