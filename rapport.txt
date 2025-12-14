@@ -1,0 +1,54 @@
+Rapport de Projet : Bon Voyage !
+1.  Présentation du projet
+Objectif :
+Ce projet consiste à développer un site web de gestion de voyages permettant aux employés d’une agence (de voyage) de :
+Créer et gérer des voyages et plus précisément les étapes qui les compose
+Gérer les réservations des clients sur ces voyages.
+
+Le site permettra aux clients de :
+s’inscrire et se connecter au site web
+Consulter les voyages disponibles
+Réserver ces mêmes voyages
+Visualiser les réservations qu’ils ont effectué
+Gérer leur profil et leurs informations personnelles.
+
+Manuel Utilisateur
+Sur la page d’accueil, en cliquant sur « Mon profil », on peut ensuite soit s’inscrire si on ne possède pas encore de compte, soit se connecter dans le cas contraire, en rentrant son login et son mot de passe, tous les deux renseignés à l’inscription.
+
+Lorsque quelqu’un est connecté en tant que client, il a accès à la page « /offres_clients » pour consulter les voyages disponibles mis en ligne par les employés de l’agence.
+Les clients peuvent aussi consulter et modifier leurs informations personnelles sur la page « Mon Profil »
+
+Les employés, eux, ont accès à la page « /offres » permettant de visualiser les voyages disponibles mais aussi de les modifier/supprimer. En cliquant sur l’ID du voyage, l’employé a accès à plus de détails sur le voyage, notamment chacune de ses étapes, et peut les modifier ou en ajouter.
+
+
+2.	Présentation technique
+Afin de réaliser ce projet, plusieurs langages de programmation ont été utilisés :
+Python avec le framework « Flask » héberge le serveur web. Plusieurs fichiers python ont été utilisés, un « main.py » sert de fichier principal pour faire fonctionner le serveur et y écrire les fonctions nécessaires pour « interfacer » la base de donnée avec le site web. Le module externe Psycopg2 sert à faire le lien entre la base de donnée en SQL et le fichier « main.py », ce lien est effectué dans le fichier « db.py »
+PostegreSQL afin de gérer tout le principe de base de donnée relationnelle et un fichier « dump.sql » qui stock le dump de la base, avec quelques valeurs pour pouvoir tester la base.
+HTML/CSS pour le front-end avec des templates Jinja pour chaque fonction/page du site web.
+
+
+Etapes de développement
+ D’abord, pour la connexion à la base de donnée, le fichier python « db.py » utilise la fonction « connect() » retournant une connexion à la base de donnée PostgreSQL.
+Ensuite, les routes principales sont, pour les clients, la route « /offres_clients » leur permet de visualiser les voyages disponibles à la réservation, « /Mon_compte » sert à la consultation du compte client et à la modification de leurs informations personnelles, par eux-même.
+Pour les employés, la route « /offres » liste les voyages proposés par l’agence, « /voyage/ajouter » permet d’ajouter un voyage à la liste des voyages proposés par l’agence. « /voyage/<int:ID>/etape/ajouter » permet à un employé de l’agence d’ajouter des étapes à un voyage.
+Enfin, Nous avons choisi d’utiliser un CSS universel à toutes les templates HTML afin d’harmoniser l’esthétique du site, tout en simplifiant le code et en réduisant la probabilité de générer des erreurs.
+
+3.	Fonctionnalités et requêtes SQL intéressantes
+Afficher les étapes d’une agence :
+SELECT
+            e.idEt,
+            e.TyP,
+            e.transport,
+            vd.nom AS ville_depart,
+            va.nom AS ville_arrivee,
+            e.dateDepart,
+            e.dateArrivee
+        FROM etape e
+        JOIN constitue c ON e.idEt = c.idEt
+        JOIN ville vd ON e.depart = vd.idVille
+        JOIN ville va ON e.arrivee = va.idVille
+        WHERE c.idVoy = %s
+        ORDER BY e.dateDepart
+
+EXPLIQUER LA REQUETE
