@@ -87,8 +87,8 @@ def voyage(ID):
     if ID == 0:
         return "Erreur, cette page n'existe pas. ", 404
     
-    """if "client" not in session and ("emp" not in session):
-        return redirect(url_for("connexion"))"""
+    if "client" not in session and ("emp" not in session):
+        return redirect(url_for("connexion"))
     
     conn = db.connect()
     cur = conn.cursor()
