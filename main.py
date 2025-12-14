@@ -81,94 +81,157 @@ def verification():
 
     return render_template("connexion_profil.html")
 
-# Affiche les détails et les étapes du voyage Pas fini et CKC 
+
+# Affiche les détails et les étapes du voyage Pas fini et CKC
 @app.route("/voyage_<int:ID>")
 def voyage(ID):
-    if ID == 0:
+    if ID <= 0:
         return "Erreur, cette page n'existe pas. ", 404
-    
+
     if "client" not in session and ("emp" not in session):
         return redirect(url_for("connexion"))
-    
+
     conn = db.connect()
     cur = conn.cursor()
 
-    cur.execute("""
+    cur.execute(
+        """
         SELECT idVoy, descriptif, dateDebut, dateFin, PrixPersonne
         FROM voyage
         WHERE idVoy = %s
         ORDER BY dateDebut
-    """,(ID,))
-    rows = cur.fetchall()
+    """,
+        (ID,),
+    )
+    v = cur.fetchone()
 
-    voyages = []
+    if v is None:
+        return "Voyage introuvable", 404
 
-    for v in rows:
-        idVoy = v[0]
-
-        # Étapes
-        cur.execute("""
-            SELECT idEt 
-            FROM constitue
-            WHERE idVoy = %s
-            ORDER BY idEt
-        """, (idVoy,))
-        etapes = [e[0] for e in cur.fetchall()]
-
-        # Visas (CKC)
-        """"
-        cur.execute(""
-            SELECT v.nomVisa
-            FROM visa v
-            JOIN voyage_visa vv ON v.idVisa = vv.idVisa
-            WHERE vv.idVoy = %s
-        "", (idVoy,))
-        visas = [vi[0] for vi in cur.fetchall()]"""
-
-        voyages.append({
-            "idVoy": idVoy,
-            "descriptif": v[1],
-            "dateDebut": v[2],
-            "dateFin": v[3],
-            "prix": v[4],
-            "etapes": etapes
-            #"visas": visas
-        })
+    # Étapes
+    cur.execute(
+        """
+        SELECT
+            e.idEt,
+            e.TyP,
+            e.transport,
+            vd.nom AS ville_depart,
+            va.nom AS ville_arrivee,
+            e.dateDepart,
+            e.dateArrivee
+        FROM etape e
+        JOIN constitue c ON e.idEt = c.idEt
+        JOIN ville vd ON e.depart = vd.idVille
+        JOIN ville va ON e.arrivee = va.idVille
+        WHERE c.idVoy = %s
+        ORDER BY e.dateDepart
+    """,
+        (ID,),
+    )
+    etapes = cur.fetchall()
 
     cur.close()
     conn.close()
 
-    return render_template("voyage.html", voyages=voyages)
+    return render_template(
+        "voyage.html",
+        voyage={
+            "idVoy": v[0],
+            "descriptif": v[1],
+            "dateDebut": v[2],
+            "dateFin": v[3],
+            "prix": v[4],
+            "etapes": etapes,
+        },
+    )
 
+
+@app.route("/voyage/<int:ID>/etape/ajouter", methods=["GET", "POST"])
+def ajouter_etape(ID):
+    if "emp" not in session:
+        return redirect(url_for("/connexion.html"))
+
+    conn = db.connect()
+    cur = conn.cursor()
+
+    # on check l'existence du voyage
+    cur.execute("SELECT idVoy FROM voyage WHERE idVoy = %s", (ID,))
+    if cur.fetchone() is None:
+        cur.close()
+        conn.close()
+        return "Voyage inexistant", 404
+
+    # on récupère les villes
+    cur.execute("SELECT idVille, nom FROM ville ORDER BY nom")
+    villes = cur.fetchall()
+
+    if request.method == "POST":
+        typ = request.form.get("typ")
+        transport = request.form.get("transport")
+        depart = request.form.get("depart")
+        arrivee = request.form.get("arrivee")
+        dateDepart = request.form.get("dateDepart")
+        dateArrivee = request.form.get("dateArrivee")
+
+        # on insère l'étape
+        cur.execute(
+            """
+            INSERT INTO etape (TyP, transport, depart, arrivee, dateDepart, dateArrivee)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING idEt
+            """,
+            (typ, transport, depart, arrivee, dateDepart, dateArrivee),
+        )
+
+        e = cur.fetchone()
+        if e is None:
+            conn.rollback()
+            cur.close()
+            conn.close()
+            return "Erreur à la création de l'étape", 500
+
+        idEt = e[0]
+
+        # on fait la liaison avec le voyage
+        cur.execute("INSERT INTO constitue (idVoy, idEt) VALUES (%s, %s)", (ID, idEt))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return redirect(f"/voyage_{ID}")
+
+    cur.close()
+    conn.close()
+
+    return render_template("ajouter_etape.html", idVoy=ID, villes=villes)
 
 
 ####################################################################################################
 #####################   Fonctions pour Espace Client   #############################################
 
 
-
-# Fait à l'arrache mais fonctionnel
+# fonctionnel
 @app.route("/profil_client<string:login>")
 def espace_client(login):
     if "client" not in session:
         return redirect("/connexion")
-    
+
     with conn.cursor() as cur:
         cur.execute("SELECT * FROM client WHERE idCli = %s;", (login,))
         tmp = cur.fetchone()
         cur.close()
     return render_template("espace_client.html", cli=tmp)
 
+
 @app.route("/Mon_compte", methods=["GET", "POST"])
 def compte_client():
     if "client" not in session:
         return redirect("/connexion")
 
-
     idCli = session["client"][0]
     conn = db.connect()
     cur = conn.cursor()
-
 
     # Mise à jour des infos personnelles
     if request.method == "POST":
@@ -176,38 +239,42 @@ def compte_client():
         prenom = request.form.get("prenom")
         email = request.form.get("courriel")
 
-
         cur.execute(
             """
             UPDATE client
             SET nom = %s, prenom = %s, courriel = %s
             WHERE idCli = %s
-            """,(nom, prenom, email, idCli),)
+            """,
+            (nom, prenom, email, idCli),
+        )
         conn.commit()
-
 
     # Infos client
     cur.execute("SELECT nom, prenom, courriel FROM client WHERE idCli = %s", (idCli,))
     client = cur.fetchone()
 
-
     # Réservations
     cur.execute(
-    """
+        """
     SELECT f.idVoy,v.descriptif, v.PrixPersonne, v.dateDebut, v.dateFin
     FROM fait f
     JOIN voyage v ON f.idVoy = v.idVoy
     WHERE f.idCli = %s
     ORDER BY v.dateDebut DESC
-    """,(idCli,),)
+    """,
+        (idCli,),
+    )
     reservations = cur.fetchall()
-
 
     cur.close()
     conn.close()
 
+    return render_template(
+        "Mon_compte.html",
+        client=client,
+        reservations=reservations,
+    )
 
-    return render_template("Mon_compte.html", client=client,reservations=reservations,)
 
 @app.route("/offres_client")
 def offres_client():
@@ -227,20 +294,19 @@ def offres_client():
         WHERE v.dateDebut >= CURRENT_DATE
         ORDER BY v.dateDebut
         """
-        )
+    )
     voyages = cur.fetchall()
     print(voyages)
 
     cur.close()
     conn.close()
 
-    return render_template("offres_client.html", cli=cli,voyages=voyages)
-
-
+    return render_template("offres_client.html", cli=cli, voyages=voyages)
 
 
 #####################   Fin : Fonctions pour Espace Client   ########################################
 #####################################################################################################
+
 
 # Fait à l'arrache mais fonctionnel
 @app.route("/profil_pro<string:login>")
@@ -260,7 +326,6 @@ def liste_voyages():
     if "emp" not in session and "client" not in session:
         return redirect("/connexion")
 
-    
     emp = session["emp"]
     id_emp = emp[0]
 
@@ -300,7 +365,8 @@ def liste_voyages():
     conn.close()
 
     return render_template("liste_voyages.html", emp=emp, voyages=voyages)
-    
+
+
 @app.route("/voyage/ajouter", methods=["Get", "POST"])
 def ajouter_voyage():
     if "emp" not in session:

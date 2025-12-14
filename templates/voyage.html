@@ -1,67 +1,68 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Voyages disponibles</title>
-    <style>
-        body { font-family: Arial; }
-        .voyage {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        h2 { margin-top: 0; }
-        ul { margin: 5px 0; }
-        .prix {
-            font-weight: bold;
-            color: darkgreen;
-            font-size: 1.1em;
-        }
-    </style>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Voyages disponibles</title>
+        <style>
+            body {
+                font-family: Arial;
+            }
+            .voyage {
+                border: 1px solid #ccc;
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 8px;
+            }
+            h2 {
+                margin-top: 0;
+            }
+            ul {
+                margin: 5px 0;
+            }
+            .prix {
+                font-weight: bold;
+                color: darkgreen;
+                font-size: 1.1em;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>{{ voyage.descriptif }}</h1>
 
-<h1>Nos voyages</h1>
+        <p>
+            Du {{ voyage.dateDebut }} au {{ voyage.dateFin }}<br />
+            <strong>{{ voyage.prix }} € / personne</strong>
+        </p>
 
-{% for v in voyages %}
-<div class="voyage">
+        <h3>Étapes du voyage</h3>
 
-    <h2>{{ v.descriptif }}</h2>
-
-    <p>
-        <strong>Dates :</strong>
-        du {{ v.dateDebut }} au {{ v.dateFin }}
-    </p>
-
-    <p class="prix">
-        Prix par personne : {{ v.prix }} €
-    </p>
-
-    <h3>Étapes du voyage</h3>
-    {% if v.etapes %}
+        {% if voyage.etapes %}
         <ul>
-            {% for e in v.etapes %}
-                <li>{{ e }}</li>
+            {% for e in voyage.etapes %}
+            <li>
+                <strong>{{ e[1] }}</strong> ({{ e[2] }})<br />
+                {{ e[3] }} → {{ e[4] }}<br />
+                du {{ e[5] }} au {{ e[6] }} {% if "emp" in session %}
+                <br />
+                {% if "emp" in session %}
+                <p>
+                    <a href="/voyage/{{ voyage.idVoy }}/etape/ajouter">
+                        ➕ Ajouter une étape
+                    </a>
+                </p>
+                {% endif %}
+                <a href="/etape/{{ e[0] }}/edit">✏️ Modifier</a>
+                <a
+                    href="/etape/{{ e[0] }}/delete"
+                    onclick="return confirm('Supprimer cette étape ?')"
+                    >🗑️ Supprimer</a
+                >
+                {% endif %}
+            </li>
             {% endfor %}
         </ul>
-    {% else %}
-        <p>Aucune étape renseignée.</p>
-    {% endif %}
-
-    <h3>Visas requis</h3>
-    {% if v.visas %}
-        <ul>
-            {% for visa in v.visas %}
-                <li>{{ visa }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Aucun visa requis.</p>
-    {% endif %}
-
-</div>
-{% endfor %}
-
-</body>
+        {% else %}
+        <p>Aucune étape définie pour ce voyage.</p>
+        {% endif %}
+    </body>
 </html>

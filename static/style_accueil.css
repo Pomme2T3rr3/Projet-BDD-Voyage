@@ -10,136 +10,42 @@ body {
     background-attachment: fixed;
     color: #fff;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    image-rendering: high-quality;
 }
 
-/* HEADER */
-header {
+h1,
+h2,
+h3 {
     text-align: center;
-    margin-bottom: 40px;
-}
-
-header h1 {
     color: #fff;
-    font-size: 3rem;
-    letter-spacing: 1px;
-    font-weight: 800;
-    text-shadow: 3px 4px 12px rgba(0, 0, 0, 0.75);
+    text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+    margin: 15px 0;
 }
 
-/* CONTENEUR CENTRAL */
-.welcome-container {
+h1 {
+    font-size: 2.8rem;
+}
+
+h2 {
+    font-size: 2rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+/* ===============================
+   CONTENEURS PRINCIPAUX
+   =============================== */
+.container,
+.welcome-container,
+.form-container,
+.voyage-container {
     max-width: 950px;
-    width: 92%;
-    margin: 30px auto;
-    padding: 30px;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(6px);
-
-    border-radius: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-
-    box-shadow:
-        0 6px 22px rgba(0, 0, 0, 0.45),
-        inset 0 1px 3px rgba(255, 255, 255, 0.2);
-
-    text-align: center;
-}
-
-.welcome-container h2 {
-    font-size: 1.9rem;
-    color: #fff;
-    font-weight: 700;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px rgba(0, 0, 0, 0.4);
-}
-
-.welcome-container p {
-    color: #f2f2f2;
-    font-size: 1.1rem;
-    margin-bottom: 30px;
-}
-
-/* Liste du menu */
-.menu-list {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-    align-items: center;
-}
-
-/* Style unifié pour les liens */
-.menu-list a,
-.menu-item {
-    display: inline-block;
-    text-decoration: none;
-    font-size: 22px;
-    font-weight: 600;
-    color: #fff;
-    padding: 14px 28px;
-    border-radius: 12px;
-
-    background: rgba(60, 40, 25, 0.65); /* Brun premium translucide */
-    border: 1px solid rgba(255, 255, 255, 0.25);
-
-    box-shadow:
-        0 3px 10px rgba(0, 0, 0, 0.5),
-        inset 0 1px 3px rgba(255, 255, 255, 0.25);
-
-    transition: all 0.25s ease;
-    backdrop-filter: blur(5px);
-}
-
-/* Survol harmonisé */
-.menu-list a:hover,
-.menu-item:hover {
-    background: rgba(120, 75, 20, 0.95);
-    transform: translateY(-3px);
-    box-shadow:
-        0 8px 22px rgba(0, 0, 0, 0.55),
-        inset 0 1px 3px rgba(255, 255, 255, 0.25);
-}
-
-.voyages-table {
-    width: 100%;
-    margin-top: 30px;
-    border-collapse: collapse;
-    color: #fff;
-}
-
-.voyages-table th,
-.voyages-table td {
-    padding: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.voyages-table th {
-    background: rgba(60, 40, 25, 0.8);
-}
-
-.voyages-table tr:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.voyages-table a {
-    color: #ffddaa;
-    font-size: 18px;
-    margin: 0 6px;
-}
-
-.form-container {
-    max-width: 600px;
     width: 90%;
-    margin: 40px auto;
-    padding: 30px;
+    margin: 30px auto;
+    padding: 25px 30px;
     background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(6px);
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow:
@@ -148,14 +54,12 @@ header h1 {
     color: #fff;
 }
 
-.form-container h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: center;
-    text-shadow: 2px 2px rgba(0, 0, 0, 0.4);
+form {
+    max-width: 600px;
+    margin: 20px auto;
 }
 
-.form-container label {
+form label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
@@ -164,35 +68,32 @@ header h1 {
     text-shadow: 1px 1px rgba(0, 0, 0, 0.3);
 }
 
-.form-container input[type="text"],
-.form-container input[type="date"],
-.form-container input[type="number"],
-.form-container textarea {
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+form textarea,
+form select {
     width: 100%;
     padding: 12px 14px;
     margin-bottom: 20px;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     background: rgba(60, 40, 25, 0.6);
     color: #fff;
     font-size: 1rem;
+    box-sizing: border-box;
     box-shadow:
         inset 0 1px 3px rgba(255, 255, 255, 0.2),
         0 2px 6px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(5px);
 }
 
-.form-container input::placeholder,
-.form-container textarea::placeholder {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.form-container textarea {
+form textarea {
     resize: vertical;
     min-height: 100px;
 }
 
-.form-container button {
+form button {
     display: block;
     width: 100%;
     padding: 14px 0;
@@ -201,16 +102,12 @@ header h1 {
     color: #fff;
     background: rgba(60, 40, 25, 0.75);
     border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 14px;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.5),
-        inset 0 1px 3px rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.25s ease;
-    backdrop-filter: blur(5px);
 }
 
-.form-container button:hover {
+form button:hover {
     background: rgba(120, 75, 20, 0.95);
     transform: translateY(-2px);
     box-shadow:
@@ -218,17 +115,121 @@ header h1 {
         inset 0 1px 3px rgba(255, 255, 255, 0.25);
 }
 
-.form-container a {
-    display: block;
-    margin-top: 15px;
-    text-align: center;
-    color: #ffddaa;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    color: #fff;
 }
 
-.form-container a:hover {
+table th,
+table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+table th {
+    background: rgba(60, 40, 25, 0.8);
+}
+
+table tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+table a {
+    color: #ffddaa;
+    text-decoration: none;
+}
+
+table a:hover {
+    text-decoration: underline;
+}
+
+.menu-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.menu-list a,
+.menu-item {
+    display: inline-block;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
     color: #fff;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    padding: 12px 28px;
+    border-radius: 12px;
+    background: rgba(60, 40, 25, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.5),
+        inset 0 1px 3px rgba(255, 255, 255, 0.25);
+    transition: all 0.25s ease;
+    backdrop-filter: blur(5px);
+}
+
+.menu-list a:hover,
+.menu-item:hover {
+    background: rgba(120, 75, 20, 0.95);
+    transform: translateY(-3px);
+}
+
+.voyage-card {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: rgba(60, 40, 25, 0.3);
+}
+
+.voyage-card h2 {
+    margin-top: 0;
+}
+
+.voyage-card p,
+.voyage-card ul {
+    margin: 8px 0;
+}
+
+.voyage-card .prix {
+    font-weight: bold;
+    color: #ffddaa;
+    font-size: 1.1rem;
+}
+
+.voyage-card a {
+    color: #ffddaa;
+    margin-right: 10px;
+}
+
+/* ===============================
+   LIEN RETOUR
+   =============================== */
+.back-link {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+    text-decoration: none;
+    font-weight: bold;
+    color: #2a7ae2;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .menu-list {
+        gap: 15px;
+    }
+
+    .form-container,
+    .voyage-container {
+        width: 95%;
+        padding: 20px;
+    }
 }

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Ajouter une étape</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+    <body>
+        <h1>Ajouter une étape au voyage {{ idVoy }}</h1>
+
+        <form method="post">
+            <label>Type d’étape :</label><br />
+            <input type="text" name="typ" required /><br /><br />
+
+            <label>Transport :</label><br />
+            <input type="text" name="transport" /><br /><br />
+
+            <label>Ville de départ :</label><br />
+            <select name="depart" required>
+                {% for v in villes %}
+                <option value="{{ v[0] }}">{{ v[1] }}</option>
+                {% endfor %}</select
+            ><br /><br />
+
+            <label>Ville d’arrivée :</label><br />
+            <select name="arrivee" required>
+                {% for v in villes %}
+                <option value="{{ v[0] }}">{{ v[1] }}</option>
+                {% endfor %}</select
+            ><br /><br />
+
+            <label>Date de départ :</label><br />
+            <input type="date" name="dateDepart" required /><br /><br />
+
+            <label>Date d’arrivée :</label><br />
+            <input type="date" name="dateArrivee" required /><br /><br />
+
+            <button type="submit">➕ Ajouter l’étape</button>
+        </form>
+
+        <p><a href="/voyage_{{ idVoy }}">⬅ Retour au voyage</a></p>
+    </body>
+</html>
