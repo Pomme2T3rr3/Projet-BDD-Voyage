@@ -27,6 +27,15 @@ def accueil():
 def connexion():
     return render_template("connexion_profil.html")
 
+# Vraiment pas sur que ça marche
+@app.route("/deconnexion")
+def deconnexion():
+    if "emp" in session:
+        session.pop("emp", None)
+        return redirect(url_for("accueil"))
+    session.pop("client", None)
+    return redirect(url_for("accueil"))    
+
 
 # Verifie le login et le mot de passe
 @app.route("/verification", methods=["GET", "POST"])
@@ -80,6 +89,39 @@ def verification():
     conn.close()
 
     return render_template("connexion_profil.html")
+
+# Effectue l'inscription du client
+@app.route("/inscription", methods=["GET", "POST"])
+def inscription():
+    if request.method == "POST":
+        # récupération des données du formulaire
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        courriel = request.form.get("courriel")
+        nat = request.form.get("nationalite")
+        adr = request.form.get("adresse")
+        numtel = request.form.get("telephone")
+        age = request.form.get("age")
+        sexe = request.form.get("sexe")
+        login = request.form.get("login")
+        mdp = request.form.get("mdp")
+
+        # validation minimale
+        if not nom or not prenom or not courriel or not nat or not adr or not numtel or not age or not sexe or not login or not mdp :
+            return "Champs manquants" , 404
+
+        # insertion en base
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO client (nom, prenom, courriel, nat, adr, numtel, age, sexe, Clogin, Cmdp)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
+        """, (nom, prenom, courriel, nat, adr, numtel, age, sexe, login, mdp))
+        conn.commit()
+
+        return redirect(url_for("connexion"))
+
+    # GET → affichage du formulaire
+    return "RTFM brotha !!!" , 404
 
 
 # Affiche les détails et les étapes du voyage Pas fini et CKC
@@ -237,20 +279,27 @@ def compte_client():
     if request.method == "POST":
         nom = request.form.get("nom")
         prenom = request.form.get("prenom")
-        email = request.form.get("courriel")
-
+        courriel = request.form.get("courriel")
+        nat = request.form.get("nationalite")
+        adr = request.form.get("adresse")
+        numtel = request.form.get("telephone")
+        age = request.form.get("age")
+        sexe = request.form.get("sexe")
+        login = request.form.get("login")
+        mdp = request.form.get("mdp")
+        
         cur.execute(
             """
             UPDATE client
-            SET nom = %s, prenom = %s, courriel = %s
+            SET nom = %s, prenom = %s, courriel = %s, nat = %s, adr = %s, numtel = %s, age = %s, sexe = %s, Clogin = %s, Cmdp = %s
             WHERE idCli = %s
             """,
-            (nom, prenom, email, idCli),
+            (nom, prenom, courriel, nat, adr, numtel, age, sexe, login, mdp, session["client"][0]),
         )
         conn.commit()
 
     # Infos client
-    cur.execute("SELECT nom, prenom, courriel FROM client WHERE idCli = %s", (idCli,))
+    cur.execute("SELECT nom, prenom, courriel, nat, adr, numtel, age, sexe, Clogin, Cmdp FROM client WHERE idCli = %s", (idCli,))
     client = cur.fetchone()
 
     # Réservations
@@ -306,6 +355,9 @@ def offres_client():
 
 #####################   Fin : Fonctions pour Espace Client   ########################################
 #####################################################################################################
+
+####################################################################################################
+#####################   Fonctions pour Espace Pro   #############################################
 
 
 # Fait à l'arrache mais fonctionnel
@@ -398,6 +450,8 @@ def ajouter_voyage():
 
     return render_template("ajout_edit_voyage.html", action="Ajouter")
 
+#####################   Fin : Fonctions pour Espace Pro   ########################################
+#####################################################################################################
 
 if __name__ == "__main__":
     app.run(debug=True)
