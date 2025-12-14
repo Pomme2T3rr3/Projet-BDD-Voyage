@@ -221,15 +221,3 @@ table a:hover {
 .back-link:hover {
     text-decoration: underline;
 }
-
-@media (max-width: 768px) {
-    .menu-list {
-        gap: 15px;
-    }
-
-    .form-container,
-    .voyage-container {
-        width: 95%;
-        padding: 20px;
-    }
-}
