@@ -65,7 +65,8 @@ dynamique à chaque ajout d'étapes en début ou en fin voyage.
  - On pourrait envisager à réfléchir à des solutions techniques astucieuses pour lutter contre le vol de données
  personnelles issue de la base de donnée site web.
 
- - Pour améliorer l'efficacité des quelconques recherches, l'utilisation d'un ou plusieurs systèmes de filtres de recherches pourrait etre très intéressants notamment dans d'immenses bases de données.
+ - Pour améliorer l'efficacité des quelconques recherches, l'utilisation d'un ou plusieurs systèmes de filtres de recherches pourrait etre très intéressants
+  notamment dans la manipulation d'un nombre importannts de données d'immenses bases de données.
 
 5. Répartition du travail
 
