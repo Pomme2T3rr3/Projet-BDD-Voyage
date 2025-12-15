@@ -450,6 +450,57 @@ def ajouter_voyage():
 
     return render_template("ajout_edit_voyage.html", action="Ajouter")
 
+@app.route("/voyage/<int:idVoy>/delete")
+def supprimer_voyage(idVoy):
+    # Vérification : uniquement un employé connecté
+    if "emp" not in session:
+        return redirect("/connexion")
+
+    emp = session["emp"]
+    id_emp = emp[0]
+
+    conn = db.connect()
+    cur = conn.cursor()
+
+    # Vérifier que le voyage appartient bien à l'agence de l'employé
+    cur.execute(
+        """
+        SELECT v.idVoy
+        FROM voyage v
+        JOIN employe e ON v.planifie_par = e.idEmp
+        WHERE v.idVoy = %s AND e.idEmp = %s
+        """,
+        (idVoy, id_emp),
+    )
+
+    if cur.fetchone() is None:
+        cur.close()
+        conn.close()
+        return "Suppression non autorisée", 403
+
+    # ⚠️ Supprimer les dépendances d'abord (FK)
+    cur.execute(
+        """
+        DELETE FROM constitue
+        WHERE idVoy = %s
+        """,
+        (idVoy,),
+    )
+
+    # Supprimer le voyage
+    cur.execute(
+        """
+        DELETE FROM voyage
+        WHERE idVoy = %s
+        """,
+        (idVoy,),
+    )
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect("/offres")
+
 #####################   Fin : Fonctions pour Espace Pro   ########################################
 #####################################################################################################
 
