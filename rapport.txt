@@ -51,4 +51,31 @@ SELECT
         WHERE c.idVoy = %s
         ORDER BY e.dateDepart
 
-Cette requête a pour objectif d’afficher le détail complet d’un voyage, incluant toutes les étapes qui le constituent, triées dans l’ordre logique du voyage. D’abord, on sélectionne tous les attributs que l’ont veut afficher, venant de la table « etape ». Ensuite, on « etape » sur « voyage » et « etape » sur les villes de départ et d’arrivée. Enfin, on filtre sur le voyage demandé, et on trie les étapes dans l’ordres pour le voyage sélectionné.
+Cette requête a pour objectif d’afficher le détail complet d’un voyage, 
+incluant toutes les étapes qui le constituent, triées dans l’ordre logique du voyage. 
+D’abord, on sélectionne tous les attributs que l’ont veut afficher, venant de la table « etape ». 
+Ensuite, on « etape » sur « voyage » et « etape » sur les villes de départ et d’arrivée. 
+Enfin, on filtre sur le voyage demandé, et on trie les étapes dans l’ordres pour le voyage sélectionné.
+
+4. Piste d'amélioration 
+
+ - Lors de la planification d'un voyage,on pourrait envisager de rendre les dates de départs et d'arrivées 
+dynamique à chaque ajout d'étapes en début ou en fin voyage.
+
+ - On pourrait envisager à réfléchir à des solutions techniques astucieuses pour lutter contre le vol de données
+ personnelles issue de la base de donnée site web.
+
+ - Pour améliorer l'efficacité des quelconques recherches, l'utilisation d'un ou plusieurs systèmes de filtres de recherches pourrait etre très intéressants notamment dans d'immenses bases de données.
+
+5. Répartition du travail
+
+Afin d’assurer une organisation efficace tout au long du projet, nous avons utilisé un dépôt GitHub commun. 
+Cet outil nous a permis de centraliser le code, de suivre l’avancement des tâches et de collaborer de manière structurée.
+La répartition du travail s’est faite de manière équilibrée et complémentaire. 
+L’un des membres de l’équipe s’est principalement concentré sur la partie client du site, en prenant en charge le développement de l’interface utilisateur, 
+l’expérience utilisateur ainsi que l’intégration des différentes fonctionnalités visibles par l’utilisateur final.
+
+De son côté, l’autre membre a géré le côté professionnel du projet, incluant la mise en place de la logique métier, 
+la gestion des fonctionnalités destinées aux professionnels ainsi que l’organisation générale du projet.
+
+Cette méthode de travail collaborative a contribué à une meilleure productivité et à une communication fluide tout au long du développement.
