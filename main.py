@@ -10,7 +10,7 @@ from flask import (  # type: ignore
 import db
 
 app = Flask(__name__)
-app.secret_key = "secret_key_bon_voyage"
+app.secret_key = "9f3a8c6e1d4b2a8f7c9d0e4f1a6b2c8d9e3f7a1c4b6d8e0f2a5c9b7d1e"
 
 # Connexion à la base de données
 conn = db.connect()
