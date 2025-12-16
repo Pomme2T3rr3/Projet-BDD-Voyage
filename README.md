@@ -35,6 +35,6 @@ employés de la compagnie, et l'autre publique pour les clients.
 
 #### 4.2 Côté client
 - Une page de connexion, proposant à un client déjà inscrit de rentrer son identifiant et mot de passe pour s'identifier, ou à un nouveau client de remplir un formulaire pour créer son compte.
-Une page de recherche de voyages, affichant la liste des voyages à venir disponibles à la réservation. Cette page doit permettre au client de pouvoir rechercher et filtrer sur les destinations et dates de son choix.
-Une page par voyage, permettant de voir ses détails, ses étapes et les coordonnées de l'agence qui l'organise. Elle permet au client de réserver, à condition qu'il ou elle ne soit pas inscrit à un autre voyage dont les dates se chevaucheraient.
+- Une page de recherche de voyages, affichant la liste des voyages à venir disponibles à la réservation. Cette page doit permettre au client de pouvoir rechercher et filtrer sur les destinations et dates de son choix.
+- Une page par voyage, permettant de voir ses détails, ses étapes et les coordonnées de l'agence qui l'organise. Elle permet au client de réserver, à condition qu'il ou elle ne soit pas inscrit à un autre voyage dont les dates se chevaucheraient.
 — Une page compte utilisateur, permettant au client de modifier ses informations personnelles et de voir toutes ses réservations actuelles et passées.
