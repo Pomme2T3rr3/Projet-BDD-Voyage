@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>{{ action }} un employé</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+
+    <body>
+        <div class="form-container">
+            <h1>{{ action }} un employé</h1>
+
+            <form method="post">
+                <label>Nom :</label>
+                <input
+                    type="text"
+                    name="nom"
+                    value="{{ employe.nom if employe else '' }}"
+                    required
+                /><br />
+
+                <label>Prénom :</label>
+                <input
+                    type="text"
+                    name="prenom"
+                    value="{{ employe.prenom if employe else '' }}"
+                    required
+                /><br />
+
+                <label>Login :</label>
+                <input
+                    type="text"
+                    name="login"
+                    value="{{ employe.sitelogin if employe else '' }}"
+                    required
+                /><br />
+
+                <label>Mot de passe :</label>
+                <input
+                    type="password"
+                    name="mdp"
+                    {% if action == "Modifier" %} placeholder="Laisser vide pour ne pas changer"{% endif %}
+                /><br />
+
+                <button type="submit">Ajouter Employé</button>
+            </form>
+
+            <a href="/liste_emp">Retour aux employés</a>
+        </div>
+    </body>
+</html>

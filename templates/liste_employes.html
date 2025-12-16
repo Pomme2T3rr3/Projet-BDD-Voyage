@@ -1,0 +1,45 @@
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Voyages - Bon Voyage</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style_accueil.css') }}"
+        />
+    </head>
+
+    <body>
+        <header>
+            <h1>Employés de votre agence</h1>
+        </header>
+        <div class="welcome-container">
+            <table class="voyages-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>NOM</th>
+                        <th>Prenom</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in lst_emp %}
+                    <tr>
+                        <td><a href="/employe_{{ e[0] }}">{{ e[0] }}</a></td>
+                        <td>{{ e[1] }}</td>
+                        <td>{{ e[2] }}</td>
+                        <td>
+                            <a
+                                href="/employe/{{ e[0] }}/delete"
+                                onclick="return confirm('Supprimer cet employé ?')"
+                                >🗑️</a
+                            >
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="/employe/ajouter">➕ Ajouter</a>
+        </div>
+    </body>
+</html>

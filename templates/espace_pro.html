@@ -10,11 +10,15 @@
         <title>Connexion - Bon Voyage</title>
     </head>
     <header>
-        <h1>Bonjour {{ emp.prenom }} {{ emp.nom }}</h1>
+        <h1>Bonjour {{ emp[2] }} {{ emp[1] }}</h1>
         <nav class="menu-list">
             <a href="/offres">Gestion des Voyages</a>
 
-            <a href="/connexion" class="menu-item">Mon Profil</a>
+            {% if emp[0] in resp %}
+
+            <a href="/liste_emp" class="menu-item">Gérer mes employés</a>
+
+            {% endif %}
 
             <a href="/deconnexion">Déconnexion</a>
         </nav>

@@ -366,11 +366,127 @@ def espace_pro(login):
     if "emp" not in session:
         return redirect("/connexion")
 
+    id_emp = session["emp"][0]
+
     with conn.cursor() as cur:
-        cur.execute("SELECT * FROM employe WHERE sitelogin = %s;", (login,))
-        tmp = cur.fetchone()
+        cur.execute(
+            "SELECT * FROM employe WHERE idEmp = %s;",
+            (id_emp,)
+        )
+        emp = cur.fetchone()
+
+    # Liste des responsables
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT idEmp
+            FROM agence
+        """)
+        resp = [r[0] for r in cur.fetchall()]
+
+    return render_template("espace_pro.html", emp=emp, resp=resp)
+
+@app.route("/liste_emp")
+def liste_employees():
+    if "emp" not in session:
+        return redirect("/connexion")
+    emp=session["emp"]
+    idA = emp[3] 
+
+    conn = db.connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        """
+        SELECT *
+        FROM employe e
+        WHERE e.idA = %s 
+        """,(idA,)
+    )
+
+    lst_emp = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    return render_template("liste_employes.html",lst_emp=lst_emp)
+
+def est_responsable(id_emp):
+    conn = db.connect()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT 1 FROM agence WHERE idEmp = %s",
+        (id_emp,)
+    )
+    res = cur.fetchone()
+    cur.close()
+    conn.close()
+    return res is not None
+
+@app.route("/employe/ajouter", methods=["GET", "POST"])
+def ajouter_employe():
+    if "emp" not in session:
+        return redirect("/connexion")
+
+    id_emp = session["emp"][0]
+
+    if not est_responsable(id_emp):
+        return "Accès interdit", 403
+
+    if request.method == "POST":
+        nom = request.form.get("nom")
+        prenom = request.form.get("prenom")
+        login = request.form.get("login")
+        mdp = request.form.get("mdp")
+        idA = session["emp"][3]
+
+        conn = db.connect()
+        cur = conn.cursor()
+        cur.execute(
+            """
+            INSERT INTO employe (nom, prenom, sitelogin, mdp, idA)
+            VALUES (%s, %s, %s, %s, %s)
+            """,
+            (nom, prenom, login, mdp, idA),
+        )
+        conn.commit()
         cur.close()
-    return render_template("espace_pro.html", emp=tmp)
+        conn.close()
+
+        return redirect("/liste_emp")
+
+    return render_template("ajout_edit_employe.html")    
+
+# Supprime l'employe
+@app.route("/employe/<int:idEmp>/delete")
+def supprimer_employe(idEmp):
+    if "emp" not in session:
+        return redirect("/connexion")
+
+    id_emp = session["emp"][0]
+
+    if not est_responsable(id_emp):
+        return "Accès interdit", 403
+
+    conn = db.connect()
+    cur = conn.cursor()
+
+    # Empêcher l'auto-suppression
+    if id_emp == idEmp:
+        return "Impossible de se supprimer soi-même", 400
+
+    cur.execute(
+        """
+        DELETE FROM employe
+        WHERE idEmp = %s AND idA = %s
+        """,
+        (idEmp, session["emp"][3]),
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect("/liste_emp")
 
 
 @app.route("/offres")
@@ -387,7 +503,7 @@ def liste_voyages():
     # Récupérer l'agence de l'employé
     cur.execute(
         """
-        SELECT idA
+        SELECT idA, sitelogin
         FROM employe
         WHERE idEmp = %s
         """,
@@ -416,7 +532,7 @@ def liste_voyages():
     cur.close()
     conn.close()
 
-    return render_template("liste_voyages.html", emp=emp, voyages=voyages)
+    return render_template("liste_voyages.html", emp=emp, voyages=voyages, row=row)
 
 
 @app.route("/voyage/ajouter", methods=["Get", "POST"])
@@ -478,7 +594,7 @@ def supprimer_voyage(idVoy):
         conn.close()
         return "Suppression non autorisée", 403
 
-    # ⚠️ Supprimer les dépendances d'abord (FK)
+    #  Supprimer les dépendances d'abord (FK)
     cur.execute(
         """
         DELETE FROM constitue
