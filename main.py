@@ -27,6 +27,7 @@ def accueil():
 def connexion():
     return render_template("connexion_profil.html")
 
+
 # Vraiment pas sur que ça marche
 @app.route("/deconnexion")
 def deconnexion():
@@ -34,7 +35,7 @@ def deconnexion():
         session.pop("emp", None)
         return redirect(url_for("accueil"))
     session.pop("client", None)
-    return redirect(url_for("accueil"))    
+    return redirect(url_for("accueil"))
 
 
 # Verifie le login et le mot de passe
@@ -90,6 +91,7 @@ def verification():
 
     return render_template("connexion_profil.html")
 
+
 # Effectue l'inscription du client
 @app.route("/inscription", methods=["GET", "POST"])
 def inscription():
@@ -107,21 +109,35 @@ def inscription():
         mdp = request.form.get("mdp")
 
         # validation minimale
-        if not nom or not prenom or not courriel or not nat or not adr or not numtel or not age or not sexe or not login or not mdp :
-            return "Champs manquants" , 404
+        if (
+            not nom
+            or not prenom
+            or not courriel
+            or not nat
+            or not adr
+            or not numtel
+            or not age
+            or not sexe
+            or not login
+            or not mdp
+        ):
+            return "Champs manquants", 404
 
         # insertion en base
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             INSERT INTO client (nom, prenom, courriel, nat, adr, numtel, age, sexe, Clogin, Cmdp)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
-        """, (nom, prenom, courriel, nat, adr, numtel, age, sexe, login, mdp))
+        """,
+            (nom, prenom, courriel, nat, adr, numtel, age, sexe, login, mdp),
+        )
         conn.commit()
 
         return redirect(url_for("connexion"))
 
     # GET → affichage du formulaire
-    return "RTFM brotha !!!" , 404
+    return "RTFM !!!", 404
 
 
 # Affiche les détails et les étapes du voyage Pas fini et CKC
@@ -287,19 +303,34 @@ def compte_client():
         sexe = request.form.get("sexe")
         login = request.form.get("login")
         mdp = request.form.get("mdp")
-        
+
         cur.execute(
             """
             UPDATE client
             SET nom = %s, prenom = %s, courriel = %s, nat = %s, adr = %s, numtel = %s, age = %s, sexe = %s, Clogin = %s, Cmdp = %s
             WHERE idCli = %s
             """,
-            (nom, prenom, courriel, nat, adr, numtel, age, sexe, login, mdp, session["client"][0]),
+            (
+                nom,
+                prenom,
+                courriel,
+                nat,
+                adr,
+                numtel,
+                age,
+                sexe,
+                login,
+                mdp,
+                session["client"][0],
+            ),
         )
         conn.commit()
 
     # Infos client
-    cur.execute("SELECT nom, prenom, courriel, nat, adr, numtel, age, sexe, Clogin, Cmdp FROM client WHERE idCli = %s", (idCli,))
+    cur.execute(
+        "SELECT nom, prenom, courriel, nat, adr, numtel, age, sexe, Clogin, Cmdp FROM client WHERE idCli = %s",
+        (idCli,),
+    )
     client = cur.fetchone()
 
     # Réservations
@@ -370,10 +401,7 @@ def espace_pro(login):
     id_emp = session["emp"][0]
 
     with conn.cursor() as cur:
-        cur.execute(
-            "SELECT * FROM employe WHERE idEmp = %s;",
-            (id_emp,)
-        )
+        cur.execute("SELECT * FROM employe WHERE idEmp = %s;", (id_emp,))
         emp = cur.fetchone()
 
     # Liste des responsables
@@ -386,12 +414,13 @@ def espace_pro(login):
 
     return render_template("espace_pro.html", emp=emp, resp=resp)
 
+
 @app.route("/liste_emp")
 def liste_employees():
     if "emp" not in session:
         return redirect("/connexion")
-    emp=session["emp"]
-    idA = emp[3] 
+    emp = session["emp"]
+    idA = emp[3]
 
     conn = db.connect()
     cur = conn.cursor()
@@ -400,8 +429,9 @@ def liste_employees():
         """
         SELECT *
         FROM employe e
-        WHERE e.idA = %s 
-        """,(idA,)
+        WHERE e.idA = %s
+        """,
+        (idA,),
     )
 
     lst_emp = cur.fetchall()
@@ -409,19 +439,18 @@ def liste_employees():
     cur.close()
     conn.close()
 
-    return render_template("liste_employes.html",lst_emp=lst_emp)
+    return render_template("liste_employes.html", lst_emp=lst_emp)
+
 
 def est_responsable(id_emp):
     conn = db.connect()
     cur = conn.cursor()
-    cur.execute(
-        "SELECT 1 FROM agence WHERE idEmp = %s",
-        (id_emp,)
-    )
+    cur.execute("SELECT 1 FROM agence WHERE idEmp = %s", (id_emp,))
     res = cur.fetchone()
     cur.close()
     conn.close()
     return res is not None
+
 
 @app.route("/employe/ajouter", methods=["GET", "POST"])
 def ajouter_employe():
@@ -455,7 +484,8 @@ def ajouter_employe():
 
         return redirect("/liste_emp")
 
-    return render_template("ajout_edit_employe.html")    
+    return render_template("ajout_edit_employe.html")
+
 
 # Supprime l'employe
 @app.route("/employe/<int:idEmp>/delete")
@@ -567,6 +597,7 @@ def ajouter_voyage():
 
     return render_template("ajout_edit_voyage.html", action="Ajouter")
 
+
 @app.route("/voyage/<int:idVoy>/delete")
 def supprimer_voyage(idVoy):
     # Vérification : uniquement un employé connecté
@@ -617,6 +648,7 @@ def supprimer_voyage(idVoy):
     conn.close()
 
     return redirect("/offres")
+
 
 #####################   Fin : Fonctions pour Espace Pro   ########################################
 #####################################################################################################
