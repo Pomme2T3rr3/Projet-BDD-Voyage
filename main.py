@@ -360,29 +360,49 @@ def compte_client():
 @app.route("/offres_client")
 def offres_client():
     if "client" not in session:
-        redirect("/connexion")
+        return redirect("/connexion")
+
+    q = request.args.get("q", "")
+    date_debut = request.args.get("date_debut")
+    prix_max = request.args.get("prix_max")
 
     cli = session["client"]
     conn = db.connect()
     cur = conn.cursor()
-    # Récupérer les voyages
-    cur.execute(
-        """
-        SELECT v.idVoy, v.PrixPersonne, v.dateDebut, v.dateFin, v.descriptif, a.nom
+
+    sql = """
+        SELECT v.idVoy, v.PrixPersonne, v.dateDebut, v.dateFin, v.descriptif
         FROM voyage v
-        JOIN employe e ON v.planifie_par = e.idEmp
-        JOIN agence a ON e.idA = a.idA
         WHERE v.dateDebut >= CURRENT_DATE
-        ORDER BY v.dateDebut
-        """
-    )
+    """
+    params = []
+
+    if q:
+        sql += " AND LOWER(v.descriptif) LIKE %s"
+        params.append(f"%{q.lower()}%")
+
+    if date_debut:
+        sql += " AND v.dateDebut >= %s"
+        params.append(date_debut)
+
+    if prix_max:
+        sql += " AND v.PrixPersonne <= %s"
+        params.append(prix_max)
+
+    sql += " ORDER BY v.dateDebut"
+
+    cur.execute(sql, tuple(params))
+    print(sql, params)
     voyages = cur.fetchall()
-    print(voyages)
 
     cur.close()
     conn.close()
 
-    return render_template("offres_client.html", cli=cli, voyages=voyages)
+    return render_template(
+        "offres_client.html",
+        voyages=voyages,
+        cli=cli
+    )
 
 
 #####################   Fin : Fonctions pour Espace Client   ########################################

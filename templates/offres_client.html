@@ -14,7 +14,17 @@
         <header>
             <h1>Nos offres de voyages</h1>
         </header>
-
+        <form method="get" action="/offres_client" class="search-form">
+            <input
+                type="text"
+                name="q"
+                placeholder="Rechercher par destination, descriptif..."
+                value="{{ request.args.get('q', '') }}"
+            />
+            <input type="date" name="date_debut" />
+            <input type="number" name="prix_max" placeholder="Prix max (€)" />
+            <button type="submit">🔍 Rechercher</button>
+        </form>
         <div class="welcome-container">
             
             <table class="voyages-table">
