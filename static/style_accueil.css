@@ -72,6 +72,7 @@ form input[type="text"],
 form input[type="number"],
 form input[type="date"],
 form input[type="password"],
+form input[type="submit"],
 form textarea,
 form select {
     width: 100%;

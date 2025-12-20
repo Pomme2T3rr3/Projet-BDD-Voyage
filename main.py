@@ -320,6 +320,7 @@ def compte_client():
 
     return render_template(
         "Mon_compte.html",
+        idCli = idCli,
         client=client,
         reservations=reservations,
     )
